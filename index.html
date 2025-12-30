@@ -842,18 +842,15 @@
 
         // Download: Worker üzerinden attachment indir
         dlBtn.addEventListener("click", (e) => {
-          e.stopPropagation();
-          const fileUrl = urlFor(it);
-          const dlUrl = DL_PROXY + "?u=" + encodeURIComponent(fileUrl);
+  e.stopPropagation();
 
-          const a = document.createElement("a");
-          a.href = dlUrl;
-          a.setAttribute("download", it.file || "");
-          a.rel = "noopener";
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-        });
+  const fileUrl = urlFor(it); // archive download url
+  const dlUrl = DL_PROXY + "?u=" + encodeURIComponent(fileUrl);
+
+  // 🔥 22-23’teki gibi ZORLA Worker’a git
+  window.location.href = dlUrl;
+});
+
 
         for (const b of [favBtn, selBtn, dlBtn]){
           b.addEventListener("pointerup", (e) => e.stopPropagation());
