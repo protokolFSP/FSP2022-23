@@ -271,6 +271,51 @@
     .miniBtn:hover{ background: var(--hover); }
     .miniBtn svg{ width:16px; height:16px; }
 
+    /* ✅ Speed controls (🐢 / speed / 🐇) */
+    .speedWrap{
+      display:flex;
+      align-items:center;
+      gap: 6px;
+      padding: 4px;
+      border: 1px solid #d8d8d8;
+      border-radius: 14px;
+      background: white;
+      user-select:none;
+    }
+    .speedCtlBtn{
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      border: 1px solid #d8d8d8;
+      background: white;
+      cursor: pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size: 18px;
+      line-height: 1;
+    }
+    .speedCtlBtn:hover{ background: var(--hover); }
+
+    .speedValue{
+      min-width: 56px;
+      height: 36px;
+      border-radius: 12px;
+      border: 1px solid #d8d8d8;
+      background: white;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-variant-numeric: tabular-nums;
+      font-weight: 650;
+      padding: 0 10px;
+      cursor: default;
+    }
+    .speedValue.on{
+      border-color:#2b7cff;
+      box-shadow: 0 0 0 3px rgba(43,124,255,.12) inset;
+    }
+
     #fpBody{
       padding: 10px 12px 12px 12px;
     }
@@ -286,22 +331,21 @@
       border-radius: 12px;
     }
 
-  .pageTitle{
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: #0b5fff;
-    background: #f1f5ff;
-    padding: 12px 16px;
-    border-radius: 14px;
-    margin-bottom: 14px;
-  }
-</style>
+    .pageTitle{
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #0b5fff;
+      background: #f1f5ff;
+      padding: 12px 16px;
+      border-radius: 14px;
+      margin-bottom: 14px;
+    }
+  </style>
 
 </head>
 
 <body>
   <h1 class="pageTitle">Alfabetik 2022–23 FSP A–Z</h1>
-  
 
   <div class="topbar">
     <input id="search" type="text" placeholder="Arama (ör. ACS, DM, PAVK)..." />
@@ -355,6 +399,14 @@
     <div id="fpHeader" title="Sürükle">
       <div id="fpTitle">Bir kayıt seç...</div>
       <div id="fpHeaderRight">
+
+        <!-- ✅ Speed: 🐢 / value / 🐇 -->
+        <div id="speedWrap" class="speedWrap" aria-label="Hız">
+          <button id="slowBtn" class="speedCtlBtn" type="button" title="Yavaşlat (🐢)">🐢</button>
+          <div id="speedValue" class="speedValue on" title="Oynatma hızı">1×</div>
+          <button id="fastBtn" class="speedCtlBtn" type="button" title="Hızlandır (🐇)">🐇</button>
+        </div>
+
         <button id="prevBtn" class="miniBtn" type="button" title="Önceki">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M19 20L9 12l10-8v16z"/><path d="M5 19V5"/>
@@ -398,6 +450,11 @@
     const prevBtn = document.getElementById("prevBtn");
     const nextBtn = document.getElementById("nextBtn");
 
+    // ✅ Speed controls
+    const slowBtn = document.getElementById("slowBtn");
+    const fastBtn = document.getElementById("fastBtn");
+    const speedValueEl = document.getElementById("speedValue");
+
     const filterFavBtn  = document.getElementById("filterFav");
     const filterSelBtn  = document.getElementById("filterSel");
     const resetBtn      = document.getElementById("resetBtn");
@@ -408,7 +465,7 @@
     const sortDateIcon = document.getElementById("sortDateIcon");
 
     // =========================
-    // Plyr
+    // Plyr (✅ popup settings yok)
     // =========================
     const plyr = new Plyr(playerEl, {
       seekTime: 5,
@@ -420,11 +477,8 @@
         "current-time",
         "duration",
         "mute",
-        "volume",
-        "settings"
-      ],
-      settings: ["speed"],
-      speed: { selected: 1, options: [ 0.75, 1, 1.25 ] }
+        "volume"
+      ]
     });
 
     // =========================
@@ -439,7 +493,8 @@
       sortDirDur: "fsp.sort.dur.dir.v2",
       sortDirDate: "fsp.sort.date.dir.v2",
       cacheItems: `fsp.cache.items.${ARCHIVE_ID}.v1`,
-      cacheFp:    `fsp.cache.fp.${ARCHIVE_ID}.v1`
+      cacheFp:    `fsp.cache.fp.${ARCHIVE_ID}.v1`,
+      speed: "fsp.speed.v1"
     };
 
     const loadMap = (k) => { try { return JSON.parse(localStorage.getItem(k) || "{}"); } catch { return {}; } };
@@ -462,20 +517,68 @@
     let lastFp = localStorage.getItem(LS.cacheFp) || "";
 
     // =========================
+    // SPEED (🐢 / 🐇) — 0.5 0.75 0.9 1 1.25 1.5 1.75
+    // =========================
+    const SPEEDS = [0.5, 0.75, 0.9, 1, 1.25, 1.5, 1.75];
+    let speedIndex = SPEEDS.indexOf(1);
+
+    function fmtSpeed(v){
+      const s = (Math.round(v * 100) / 100).toString();
+      return s.replace(/\.0+$/,"") + "×";
+    }
+
+    function setSpeedUI(v){
+      speedValueEl.textContent = fmtSpeed(v);
+      speedValueEl.classList.add("on");
+      slowBtn.disabled = (speedIndex <= 0);
+      fastBtn.disabled = (speedIndex >= SPEEDS.length - 1);
+      slowBtn.style.opacity = slowBtn.disabled ? 0.45 : 1;
+      fastBtn.style.opacity = fastBtn.disabled ? 0.45 : 1;
+    }
+
+    function applySpeedByIndex(idx){
+      speedIndex = Math.max(0, Math.min(SPEEDS.length - 1, idx));
+      const v = SPEEDS[speedIndex];
+      plyr.speed = v;
+      localStorage.setItem(LS.speed, String(v));
+      setSpeedUI(v);
+    }
+
+    function restoreSpeed(){
+      const saved = Number(localStorage.getItem(LS.speed) || "1");
+      if (Number.isFinite(saved)){
+        const i = SPEEDS.findIndex(x => Math.abs(x - saved) < 0.001);
+        applySpeedByIndex(i === -1 ? SPEEDS.indexOf(1) : i);
+      } else {
+        applySpeedByIndex(SPEEDS.indexOf(1));
+      }
+    }
+
+    slowBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      applySpeedByIndex(speedIndex - 1);
+    });
+
+    fastBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      applySpeedByIndex(speedIndex + 1);
+    });
+
+    // =========================
     // Helpers
     // =========================
     function normTR(s){
-  return (s || "")
-    .toLocaleLowerCase("tr")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "") // aksanları sil
-    .replace(/ı/g, "i")
-    .replace(/İ/g, "i")
-    .replace(/ü/g, "u")
-    .replace(/ö/g, "o")
-    .replace(/ş/g, "s")
-    .replace(/ç/g, "c")
-    .replace(/ğ/g, "g");
+      return (s || "")
+        .toLocaleLowerCase("tr")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/ı/g, "i")
+        .replace(/İ/g, "i")
+        .replace(/ü/g, "u")
+        .replace(/ö/g, "o")
+        .replace(/ş/g, "s")
+        .replace(/ç/g, "c")
+        .replace(/ğ/g, "g");
     }
 
     function guessMime(url){
@@ -713,7 +816,6 @@
 
       const fp = makeFingerprint(newItems);
 
-      // değişiklik yoksa çık
       if (fp === lastFp && items.length) return false;
 
       items = newItems;
@@ -740,7 +842,6 @@
         statusEl.textContent = hadCache ? "" : "Arşivden kayıtlar çekilemedi.";
       }
 
-      // Sayfa açıkken otomatik güncelle (3 dk)
       setInterval(() => {
         fetchFromArchive().catch(() => {});
       }, 180000);
@@ -840,17 +941,13 @@
           render();
         });
 
-        // Download: Worker üzerinden attachment indir
+        // Download: Worker üzerinden attachment indir (mevcut davranış korunuyor)
         dlBtn.addEventListener("click", (e) => {
-  e.stopPropagation();
-
-  const fileUrl = urlFor(it); // archive download url
-  const dlUrl = DL_PROXY + "?u=" + encodeURIComponent(fileUrl);
-
-  // 🔥 22-23’teki gibi ZORLA Worker’a git
-  window.location.href = dlUrl;
-});
-
+          e.stopPropagation();
+          const fileUrl = urlFor(it);
+          const dlUrl = DL_PROXY + "?u=" + encodeURIComponent(fileUrl);
+          window.location.href = dlUrl;
+        });
 
         for (const b of [favBtn, selBtn, dlBtn]){
           b.addEventListener("pointerup", (e) => e.stopPropagation());
@@ -926,7 +1023,11 @@
         sources: [{ src: url, type: mime }]
       };
 
+      // ✅ kaynak değişince speed resetlenirse tekrar uygula
+      const currentSpeed = SPEEDS[speedIndex] || 1;
+
       const tryPlay = () => {
+        plyr.speed = currentSpeed;
         const p = plyr.play();
         if (p && typeof p.catch === "function"){
           p.catch(() => {
@@ -967,6 +1068,11 @@
 
     prevBtn.addEventListener("click", playPrev);
     nextBtn.addEventListener("click", playNext);
+
+    // ✅ Kayıt bitince otomatik sonraki (Plyr event’i daha stabil)
+    plyr.on("ended", () => {
+      setTimeout(() => playNext(), 0);
+    });
 
     document.addEventListener("keydown", (e) => {
       const tag = (document.activeElement && document.activeElement.tagName || "").toLowerCase();
@@ -1015,6 +1121,7 @@
           fp.style.left = s.x + "px";
           fp.style.top = s.y + "px";
           fp.style.bottom = "auto";
+          fp.style.right = "auto";
         }
       }catch{}
     }
@@ -1042,6 +1149,7 @@
       fp.style.left = startLeft + "px";
       fp.style.top = startTop + "px";
       fp.style.bottom = "auto";
+      fp.style.right = "auto";
     });
 
     fpHeader.addEventListener("pointermove", (e) => {
@@ -1078,9 +1186,8 @@
     // =========================
     setSortIcons();
     restorePlayerPos();
+    restoreSpeed();
     loadItems();
   </script>
 </body>
 </html>
-
-
