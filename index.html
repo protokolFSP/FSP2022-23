@@ -15,6 +15,8 @@
       --hover:#f7f7f7;
       --active:#e8f3ff;
       --shadow: 0 12px 30px rgba(0,0,0,.12);
+
+      --blue:#2b7cff;
     }
 
     body{
@@ -33,7 +35,7 @@
       letter-spacing: .2px;
     }
 
-    /* ✅ NAV (eklendi) */
+    /* ✅ NAV */
     .navRow{
       display:flex;
       gap:10px;
@@ -99,13 +101,12 @@
       line-height: 1.05;
     }
 
-    /* HEADER + ROWS */
+    /* ✅ FIX: Güncel ile aynı grid (Kayıt | Süre | ⭐ | ✓ | ⬇︎) */
     .headerRow, .itemRow{
       display: grid;
-      /* ✅ FIX: Süre kolonu daraltıldı (8ch) -> başlıklar daha az kesilir */
-      grid-template-columns: minmax(0, 1fr) 8ch 260px; /* Kayıt | Süre | İşlemler */
+      grid-template-columns: minmax(0, 1fr) 8ch 36px 36px 36px;
       align-items: center;
-      column-gap: 10px;
+      column-gap: 8px;
     }
 
     .headerRow{
@@ -117,22 +118,22 @@
       line-height: 1.05;
     }
 
-    .colActions{
-      display:flex;
-      align-items:center;
-      justify-content:flex-end;
-      gap:10px;
-      user-select:none;
-    }
-
     .titleHead, .durHead{
       display:flex;
       align-items:center;
       gap:8px;
       user-select:none;
+      width: 100%;
     }
     .titleHead{ justify-content:flex-start; }
     .durHead{ justify-content:flex-end; }
+
+    .headIconCell{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      user-select:none;
+    }
 
     .sortBtn{
       width: 28px;
@@ -186,21 +187,13 @@
 
     @media (max-width: 680px){
       body{ margin: 14px; }
-      /* ✅ FIX: mobilde de süre 8ch */
-      .headerRow, .itemRow{ grid-template-columns: minmax(0, 1fr) 8ch 210px; }
+      .headerRow, .itemRow{ grid-template-columns: minmax(0, 1fr) 8ch 36px 36px 36px; }
       .title{
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
       }
       #search{ flex: 1 1 100%; }
-    }
-
-    .actions{
-      display:flex;
-      align-items:center;
-      justify-content:flex-end;
-      gap: 6px;
     }
 
     .iconBtn{
@@ -215,6 +208,7 @@
       cursor: pointer;
       flex: 0 0 auto;
       user-select:none;
+      justify-self: center;
     }
     .iconBtn:hover{ background: var(--hover); }
     .iconBtn.on{
@@ -379,7 +373,6 @@
 <body>
   <h1 class="pageTitle">Alfabetik 2022–23 FSP A–Z</h1>
 
-  <!-- ✅ NAV (eklendi) — Güncel / 22–23 / All-in-One -->
   <nav class="navRow" aria-label="Sayfalar">
     <a class="navLink" href="https://protokolfsp.github.io/fsp-audio/">Güncel</a>
     <a class="navLink" href="https://protokolfsp.github.io/FSP2022-23/">2022–23</a>
@@ -393,6 +386,7 @@
 
   <div id="meta">Görünən: 0 / Toplam: 0</div>
 
+  <!-- Header: Kayıt | Süre | ⭐ | ✓ | (boş) -->
   <div class="headerRow">
     <div class="colTitle">
       <div class="titleHead">
@@ -416,19 +410,23 @@
       </div>
     </div>
 
-    <div class="colActions">
+    <div class="headIconCell">
       <button id="filterFav" class="filterBtn" title="Favoriler filtrele" type="button" aria-pressed="false">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1L12 2z"/>
         </svg>
       </button>
+    </div>
 
+    <div class="headIconCell">
       <button id="filterSel" class="filterBtn" title="Seçilenler filtrele" type="button" aria-pressed="false">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M20 6L9 17l-5-5"/>
         </svg>
       </button>
     </div>
+
+    <div class="headIconCell" aria-hidden="true"></div>
   </div>
 
   <div id="list"></div>
@@ -958,9 +956,6 @@
         dur.className = "dur";
         dur.textContent = (durs[it.id] > 0) ? fmtDur(durs[it.id]) : "…";
 
-        const actions = document.createElement("div");
-        actions.className = "actions";
-
         const favBtn = iconButton("star", !!favs[it.id], "Favori");
         const selBtn = iconButton("check", !!sels[it.id], "Seç");
         const dlBtn  = iconButton("download", false, "İndir");
@@ -979,7 +974,6 @@
           render();
         });
 
-        // Download: Worker üzerinden attachment indir (mevcut davranış korunuyor)
         dlBtn.addEventListener("click", (e) => {
           e.stopPropagation();
           const fileUrl = urlFor(it);
@@ -992,13 +986,11 @@
           b.addEventListener("pointerdown", (e) => e.stopPropagation());
         }
 
-        actions.appendChild(favBtn);
-        actions.appendChild(selBtn);
-        actions.appendChild(dlBtn);
-
         row.appendChild(title);
         row.appendChild(dur);
-        row.appendChild(actions);
+        row.appendChild(favBtn);
+        row.appendChild(selBtn);
+        row.appendChild(dlBtn);
 
         row.addEventListener("click", () => playById(it.id));
         listEl.appendChild(row);
@@ -1216,7 +1208,7 @@
     });
 
     // =========================
-    // ✅ NAV ACTIVE (eklendi)
+    // ✅ NAV ACTIVE
     // =========================
     (function setActiveNav(){
       const here = location.href.replace(/\/$/, "");
