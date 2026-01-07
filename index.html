@@ -102,7 +102,8 @@
     /* HEADER + ROWS */
     .headerRow, .itemRow{
       display: grid;
-      grid-template-columns: 1fr 120px 260px; /* Kayıt | Süre | İşlemler */
+      /* ✅ FIX: Süre kolonu daraltıldı (8ch) -> başlıklar daha az kesilir */
+      grid-template-columns: minmax(0, 1fr) 8ch 260px; /* Kayıt | Süre | İşlemler */
       align-items: center;
       column-gap: 10px;
     }
@@ -185,7 +186,8 @@
 
     @media (max-width: 680px){
       body{ margin: 14px; }
-      .headerRow, .itemRow{ grid-template-columns: 1fr 92px 210px; }
+      /* ✅ FIX: mobilde de süre 8ch */
+      .headerRow, .itemRow{ grid-template-columns: minmax(0, 1fr) 8ch 210px; }
       .title{
         white-space: nowrap;
         overflow: hidden;
@@ -377,10 +379,10 @@
 <body>
   <h1 class="pageTitle">Alfabetik 2022–23 FSP A–Z</h1>
 
-  <!-- ✅ NAV (eklendi) — 22–23 önce -->
+  <!-- ✅ NAV (eklendi) — Güncel / 22–23 / All-in-One -->
   <nav class="navRow" aria-label="Sayfalar">
     <a class="navLink" href="https://protokolfsp.github.io/fsp-audio/">Güncel</a>
-    <a class="navLink on" href="https://protokolfsp.github.io/FSP2022-23/">2022–23</a>
+    <a class="navLink" href="https://protokolfsp.github.io/FSP2022-23/">2022–23</a>
     <a class="navLink" href="https://protokolfsp.github.io/All-in-One/">All-in-One</a>
   </nav>
 
