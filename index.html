@@ -15,7 +15,6 @@
       --hover:#f7f7f7;
       --active:#e8f3ff;
       --shadow: 0 12px 30px rgba(0,0,0,.12);
-
       --blue:#2b7cff;
     }
 
@@ -33,6 +32,16 @@
       margin: 0 0 12px 0;
       font-weight: 650;
       letter-spacing: .2px;
+    }
+
+    .pageTitle{
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #0b5fff;
+      background: #f1f5ff;
+      padding: 12px 16px;
+      border-radius: 14px;
+      margin-bottom: 14px;
     }
 
     /* ✅ NAV */
@@ -101,7 +110,7 @@
       line-height: 1.05;
     }
 
-    /* ✅ FIX: Güncel ile aynı grid (Kayıt | Süre | ⭐ | ✓ | ⬇︎) */
+    /* ✅ Grid: Kayıt | Süre | ⭐ | ✓ | ⬇︎ */
     .headerRow, .itemRow{
       display: grid;
       grid-template-columns: minmax(0, 1fr) 8ch 36px 36px 36px;
@@ -159,24 +168,22 @@
       border-bottom: 1px solid var(--border);
     }
 
-.itemRow{
-  padding: 4px 8px;
-  border-bottom: 1px solid #ececec;
-  cursor: pointer;
-  background: #f7f7f7;
-}
-
-#list .itemRow:nth-child(even){
-  background: #eeeeee;
-}
-
-.itemRow:hover{
-  background: var(--hover);
-}
-
-.itemRow.active{
-  background: var(--active);
-}
+    /* ✅ Zebra (daha belirgin) */
+    .itemRow{
+      padding: 4px 8px;
+      border-bottom: 1px solid #ececec;
+      cursor: pointer;
+      background: #f7f7f7;
+    }
+    #list .itemRow:nth-child(even){
+      background: #eeeeee;
+    }
+    .itemRow:hover{
+      background: var(--hover);
+    }
+    .itemRow.active{
+      background: var(--active);
+    }
 
     .title{
       font-size: 1.02rem;
@@ -246,11 +253,11 @@
     }
     .filterBtn svg{ width:14px; height:14px; }
 
-    /* Floating player */
+    /* ✅ Floating player (Güncel ile aynı mantık: safe-area) */
     #floatingPlayer{
       position: fixed;
-      left: 18px;
-      bottom: 18px;
+      left: max(18px, env(safe-area-inset-left));
+      bottom: max(18px, env(safe-area-inset-bottom));
       width: min(720px, calc(100vw - 36px));
       background: white;
       border: 1px solid #e0e0e0;
@@ -307,7 +314,7 @@
     .miniBtn:hover{ background: var(--hover); }
     .miniBtn svg{ width:16px; height:16px; }
 
-    /* ✅ Speed controls (🐢 / speed / 🐇) */
+    /* ✅ Speed controls */
     .speedWrap{
       display:flex;
       align-items:center;
@@ -363,27 +370,38 @@
       line-height: 1.05;
     }
 
+    /* ✅ Plyr: dar ekranda "incelme" ve buton saklamayı azalt */
     .plyr--audio .plyr__controls{
       border-radius: 12px;
+      flex-wrap: wrap;
+      row-gap: 8px;
+    }
+    .plyr--audio .plyr__controls .plyr__progress{
+      flex: 1 1 100%;
+      min-width: 0;
     }
 
-    .pageTitle{
-      font-size: 1.6rem;
-      font-weight: 700;
-      color: #0b5fff;
-      background: #f1f5ff;
-      padding: 12px 16px;
-      border-radius: 14px;
-      margin-bottom: 14px;
+    /* ✅ Mobilde player başlığı daha uzun görünsün */
+    @media (max-width: 680px){
+      #fpHeader{ flex-wrap: wrap; gap: 8px; }
+      #fpTitle{
+        flex: 1 1 100%;
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+      }
+      #fpHeaderRight{
+        width: 100%;
+        justify-content: flex-end;
+      }
     }
 
-    /* Hastalik adi (Dr/dr oncesi) */
+    /* ✅ Hastalık adı (Dr/dr öncesi) */
     .diseaseName{
-      color: #c2410c; /* daha koyu kahverengi */
+      color: #c2410c;
       font-weight: 650;
     }
   </style>
-
 </head>
 
 <body>
@@ -402,7 +420,6 @@
 
   <div id="meta">Görünən: 0 / Toplam: 0</div>
 
-  <!-- Header: Kayıt | Süre | ⭐ | ✓ | (boş) -->
   <div class="headerRow">
     <div class="colTitle">
       <div class="titleHead">
@@ -484,7 +501,7 @@
     // =========================
     const ARCHIVE_ID = "FSP21_23";
     const BASE = `https://archive.org/download/${ARCHIVE_ID}/`;
-    const DL_PROXY = "https://fspdownload.protokolfsp.workers.dev/"; // Cloudflare Worker
+    const DL_PROXY = "https://fspdownload.protokolfsp.workers.dev/";
 
     // =========================
     // DOM
@@ -502,7 +519,6 @@
     const prevBtn = document.getElementById("prevBtn");
     const nextBtn = document.getElementById("nextBtn");
 
-    // ✅ Speed controls
     const slowBtn = document.getElementById("slowBtn");
     const fastBtn = document.getElementById("fastBtn");
     const speedValueEl = document.getElementById("speedValue");
@@ -516,9 +532,6 @@
     const sortDateBtn  = document.getElementById("sortDateBtn");
     const sortDateIcon = document.getElementById("sortDateIcon");
 
-    // =========================
-    // Plyr (✅ popup settings yok)
-    // =========================
     const plyr = new Plyr(playerEl, {
       seekTime: 5,
       controls: [
@@ -569,7 +582,7 @@
     let lastFp = localStorage.getItem(LS.cacheFp) || "";
 
     // =========================
-    // SPEED (🐢 / 🐇) — 0.5 0.75 0.9 1 1.25 1.5 1.75
+    // SPEED
     // =========================
     const SPEEDS = [0.5, 0.75, 0.9, 1, 1.25, 1.5, 1.75];
     let speedIndex = SPEEDS.indexOf(1);
@@ -606,15 +619,8 @@
       }
     }
 
-    slowBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      applySpeedByIndex(speedIndex - 1);
-    });
-
-    fastBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      applySpeedByIndex(speedIndex + 1);
-    });
+    slowBtn.addEventListener("click", (e) => { e.stopPropagation(); applySpeedByIndex(speedIndex - 1); });
+    fastBtn.addEventListener("click", (e) => { e.stopPropagation(); applySpeedByIndex(speedIndex + 1); });
 
     // =========================
     // Helpers
@@ -628,17 +634,20 @@
         .replace(/'/g,"&#39;");
     }
 
-    // Hastalik ismi = ilk "Dr" veya "dr" gelene kadarki kisim
+    // ✅ Boşluğu koruyan highlight
     function highlightDisease(title){
       const raw = (title ?? "").toString();
       const m = raw.match(/\bdr\b/i);
       if (!m || m.index == null) return escHtml(raw);
 
       const i = m.index;
-      const left = raw.slice(0, i).trimEnd();
-      if (!left.trim()) return escHtml(raw);
 
-      return `<span class="diseaseName">${escHtml(left)}</span>${escHtml(raw.slice(left.length))}`;
+      const leftRaw = raw.slice(0, i);
+      const leftTrim = leftRaw.trimEnd();
+      if (!leftTrim.trim()) return escHtml(raw);
+
+      const trailing = leftRaw.slice(leftTrim.length);
+      return `<span class="diseaseName">${escHtml(leftTrim)}</span>${escHtml(trailing)}${escHtml(raw.slice(i))}`;
     }
 
     function normTR(s){
@@ -682,7 +691,6 @@
       return `${m}:${ss}`;
     }
 
-    // Dosya adının sonunda dd.mm.yy / dd.mm.yyyy varsa yakalar
     function parseEndDate(item){
       const raw0 = (item.file || item.title || "").toString();
       const lastPart = raw0.split("/").pop() || raw0;
@@ -709,11 +717,7 @@
       if (!Number.isFinite(t)) return null;
 
       const d = new Date(t);
-      if (
-        d.getUTCFullYear() !== yy ||
-        (d.getUTCMonth() + 1) !== mm ||
-        d.getUTCDate() !== dd
-      ) return null;
+      if (d.getUTCFullYear() !== yy || (d.getUTCMonth() + 1) !== mm || d.getUTCDate() !== dd) return null;
 
       return t;
     }
@@ -737,11 +741,8 @@
 
     sortDurBtn.addEventListener("click", (e) => {
       e.stopPropagation();
-      if (sortMode !== "dur"){
-        sortMode = "dur";
-      } else {
-        durSortDir = (durSortDir === "asc") ? "desc" : "asc";
-      }
+      if (sortMode !== "dur") sortMode = "dur";
+      else durSortDir = (durSortDir === "asc") ? "desc" : "asc";
       localStorage.setItem(LS.sortMode, sortMode);
       localStorage.setItem(LS.sortDirDur, durSortDir);
       setSortIcons();
@@ -750,11 +751,8 @@
 
     sortDateBtn.addEventListener("click", (e) => {
       e.stopPropagation();
-      if (sortMode !== "date"){
-        sortMode = "date";
-      } else {
-        dateSortDir = (dateSortDir === "asc") ? "desc" : "asc";
-      }
+      if (sortMode !== "date") sortMode = "date";
+      else dateSortDir = (dateSortDir === "asc") ? "desc" : "asc";
       localStorage.setItem(LS.sortMode, sortMode);
       localStorage.setItem(LS.sortDirDate, dateSortDir);
       setSortIcons();
@@ -791,12 +789,10 @@
       while (durActive < DUR_CONCURRENCY && durQueue.length){
         const it = durQueue.shift();
         durActive++;
-        loadDurationFor(it)
-          .catch(() => {})
-          .finally(() => {
-            durActive--;
-            pumpDurationQueue();
-          });
+        loadDurationFor(it).catch(() => {}).finally(() => {
+          durActive--;
+          pumpDurationQueue();
+        });
       }
     }
 
@@ -868,7 +864,6 @@
       const data = await res.json();
 
       const files = Array.isArray(data.files) ? data.files : [];
-
       const newItems = files
         .filter(f => {
           const name = (f.name || "").toLowerCase();
@@ -883,13 +878,11 @@
 
           const url = `https://archive.org/download/${ARCHIVE_ID}/${encodeURIComponent(file).replace(/%2F/g, "/")}`;
           const id = file || title;
-
           return { id, title, file, url };
         })
         .sort((a,b) => a.title.localeCompare(b.title, "tr"));
 
       const fp = makeFingerprint(newItems);
-
       if (fp === lastFp && items.length) return false;
 
       items = newItems;
@@ -1109,10 +1102,7 @@
       };
 
       playerEl.addEventListener("canplay", onCanPlay);
-
-      setTimeout(() => {
-        if (playerEl.paused) tryPlay();
-      }, 600);
+      setTimeout(() => { if (playerEl.paused) tryPlay(); }, 600);
     }
 
     function playPrev(){
@@ -1136,9 +1126,7 @@
     prevBtn.addEventListener("click", playPrev);
     nextBtn.addEventListener("click", playNext);
 
-    plyr.on("ended", () => {
-      setTimeout(() => playNext(), 0);
-    });
+    plyr.on("ended", () => { setTimeout(() => playNext(), 0); });
 
     document.addEventListener("keydown", (e) => {
       const tag = (document.activeElement && document.activeElement.tagName || "").toLowerCase();
@@ -1245,9 +1233,7 @@
       try { fpHeader.releasePointerCapture(e.pointerId); } catch {}
     });
 
-    // =========================
     // ✅ NAV ACTIVE
-    // =========================
     (function setActiveNav(){
       const here = location.href.replace(/\/$/, "");
       document.querySelectorAll(".navRow .navLink").forEach(a => {
@@ -1257,9 +1243,7 @@
       });
     })();
 
-    // =========================
     // Boot
-    // =========================
     setSortIcons();
     restorePlayerPos();
     restoreSpeed();
