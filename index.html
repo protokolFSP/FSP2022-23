@@ -13,8 +13,11 @@
       --muted:#6b6b6b;
       --bg:#ffffff;
       --hover:#f7f7f7;
-      --active:#d6ecff;          /* daha fosforlu */
-      --activeGlow: 0 0 0 2px rgba(43,124,255,.28) inset, 0 10px 22px rgba(43,124,255,.10);
+
+      /* ✅ aktif satır daha fosforlu */
+      --active:#cfe9ff;
+      --activeGlow: 0 0 0 2px rgba(43,124,255,.34) inset, 0 12px 26px rgba(43,124,255,.14);
+
       --shadow: 0 12px 30px rgba(0,0,0,.12);
       --blue:#2b7cff;
     }
@@ -169,7 +172,7 @@
       border-bottom: 1px solid var(--border);
     }
 
-    /* ✅ Zebra (daha belirgin) */
+    /* ✅ Zebra */
     .itemRow{
       padding: 4px 8px;
       border-bottom: 1px solid #ececec;
@@ -182,23 +185,28 @@
     .itemRow:hover{
       background: var(--hover);
     }
-   .itemRow.active{
-  background: var(--active) !important;
-  box-shadow: var(--activeGlow);
-  position: relative;
-}
 
-/* sol fosfor şerit */
-.itemRow.active::before{
-  content:"";
-  position:absolute;
-  left:0;
-  top:0;
-  bottom:0;
-  width:4px;
-  background: var(--blue);
-  border-radius: 4px;
-}
+    /* ✅ Aktif satır (oynayan) */
+    .itemRow.active{
+      background: var(--active) !important;
+      box-shadow: var(--activeGlow);
+      position: relative;
+    }
+    /* hover aktif satırı bozmasın */
+    .itemRow.active:hover{
+      background: var(--active) !important;
+    }
+    /* sol fosfor şerit */
+    .itemRow.active::before{
+      content:"";
+      position:absolute;
+      left:0;
+      top:0;
+      bottom:0;
+      width:4px;
+      background: var(--blue);
+      border-radius: 4px;
+    }
 
     .title{
       font-size: 1.02rem;
@@ -268,7 +276,7 @@
     }
     .filterBtn svg{ width:14px; height:14px; }
 
-    /* ✅ Floating player (Güncel ile aynı mantık: safe-area) */
+    /* ✅ Floating player */
     #floatingPlayer{
       position: fixed;
       left: max(18px, env(safe-area-inset-left));
@@ -329,7 +337,6 @@
     .miniBtn:hover{ background: var(--hover); }
     .miniBtn svg{ width:16px; height:16px; }
 
-    /* ✅ Speed controls */
     .speedWrap{
       display:flex;
       align-items:center;
@@ -385,7 +392,6 @@
       line-height: 1.05;
     }
 
-    /* ✅ Plyr: dar ekranda "incelme" ve buton saklamayı azalt */
     .plyr--audio .plyr__controls{
       border-radius: 12px;
       flex-wrap: wrap;
@@ -396,7 +402,6 @@
       min-width: 0;
     }
 
-    /* ✅ Mobilde player başlığı daha uzun görünsün */
     @media (max-width: 680px){
       #fpHeader{ flex-wrap: wrap; gap: 8px; }
       #fpTitle{
@@ -411,7 +416,6 @@
       }
     }
 
-    /* ✅ Hastalık adı (Dr/dr öncesi) */
     .diseaseName{
       color: #c2410c;
       font-weight: 650;
@@ -484,7 +488,6 @@
     <div id="fpHeader" title="Sürükle">
       <div id="fpTitle">Bir kayıt seç...</div>
       <div id="fpHeaderRight">
-
         <div id="speedWrap" class="speedWrap" aria-label="Hız">
           <button id="slowBtn" class="speedCtlBtn" type="button" title="Yavaşlat (🐢)">🐢</button>
           <div id="speedValue" class="speedValue on" title="Oynatma hızı">1×</div>
