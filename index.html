@@ -109,12 +109,12 @@
     }
     #resetBtn:hover{ background: var(--hover); }
 
-    /* ✅ Zoom - 🐜 / 🐘 (daha aralıklı + Hepsi'den uzak + canlı) */
+    /* ✅ Zoom - SVG ikon (emoji yok) */
     .zoomWrap{
       display:flex;
       align-items:center;
-      gap: 24px;
-      margin-left: 14px;
+      gap: 24px;        /* yatay boşluk 2x */
+      margin-left: 14px;/* Hepsi'den uzak */
       padding: 6px;
       border: 1px solid #d8d8d8;
       border-radius: 14px;
@@ -134,31 +134,47 @@
       align-items:center;
       justify-content:center;
       padding: 0;
-      font-size: 20px;
       -webkit-tap-highlight-color: transparent;
       transition: opacity .15s ease, box-shadow .15s ease, border-color .15s ease, background .15s ease, filter .15s ease;
     }
     .zoomBtn:hover{ background: var(--hover); }
     .zoomBtn:disabled{ opacity: .35; cursor: default; }
 
+    .zoomBtn svg{
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      opacity: .95;
+    }
+
+    /* pasifken soluk */
     .zoomBtn.zoomOut,
     .zoomBtn.zoomIn{
       opacity: .55;
       filter: saturate(1.2);
+      color: #111;
     }
+
+    /* aktifken canlı */
     .zoomBtn.enabled.zoomOut{
       opacity: 1;
       background: rgba(255, 149, 0, .18);
-      border-color: rgba(255, 149, 0, .65);
-      box-shadow: 0 0 0 3px rgba(255, 149, 0, .16) inset, 0 8px 18px rgba(255, 149, 0, .10);
-      filter: saturate(1.6);
+      border-color: rgba(255, 149, 0, .70);
+      box-shadow: 0 0 0 3px rgba(255, 149, 0, .16) inset, 0 8px 18px rgba(255, 149, 0, .12);
+      filter: saturate(1.7);
+      color: #b45309;
     }
     .zoomBtn.enabled.zoomIn{
       opacity: 1;
       background: rgba(34, 197, 94, .18);
-      border-color: rgba(34, 197, 94, .65);
-      box-shadow: 0 0 0 3px rgba(34, 197, 94, .16) inset, 0 8px 18px rgba(34, 197, 94, .10);
-      filter: saturate(1.6);
+      border-color: rgba(34, 197, 94, .70);
+      box-shadow: 0 0 0 3px rgba(34, 197, 94, .16) inset, 0 8px 18px rgba(34, 197, 94, .12);
+      filter: saturate(1.7);
+      color: #15803d;
     }
 
     #meta{
@@ -222,9 +238,7 @@
       box-shadow: 0 0 0 3px rgba(43,124,255,.12) inset;
     }
 
-    #list{
-      border-bottom: 1px solid var(--border);
-    }
+    #list{ border-bottom: 1px solid var(--border); }
 
     /* Zebra */
     .itemRow{
@@ -233,12 +247,8 @@
       cursor: pointer;
       background: #f7f7f7;
     }
-    #list .itemRow:nth-child(even){
-      background: #eeeeee;
-    }
-    .itemRow:hover{
-      background: var(--hover);
-    }
+    #list .itemRow:nth-child(even){ background: #eeeeee; }
+    .itemRow:hover{ background: var(--hover); }
 
     /* Aktif satır */
     .itemRow.active{
@@ -246,9 +256,7 @@
       box-shadow: var(--activeGlow);
       position: relative;
     }
-    .itemRow.active:hover{
-      background: var(--active) !important;
-    }
+    .itemRow.active:hover{ background: var(--active) !important; }
     .itemRow.active::before{
       content:"";
       position:absolute;
@@ -280,11 +288,7 @@
     @media (max-width: 680px){
       body{ margin: 14px; }
       .headerRow, .itemRow{ grid-template-columns: minmax(0, 1fr) 8ch 36px 36px 36px; }
-      .title{
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
+      .title{ white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       #search{ flex: 1 1 100%; }
     }
 
@@ -318,7 +322,6 @@
       stroke: var(--green);
       stroke-width: 2.6;
     }
-
     .iconBtn svg{ width: 14px; height: 14px; opacity: .9; }
 
     .filterBtn{
@@ -357,9 +360,10 @@
       transform-origin: top left;
       will-change: transform;
       transition: opacity .18s ease;
+      touch-action: none; /* ✅ tüm player sürüklemede daha stabil */
     }
 
-    /* ✅ Arama sırasında player görünmesin */
+    /* Arama sırasında player görünmesin */
     #floatingPlayer.hiddenWhileTyping{
       opacity: 0;
       pointer-events: none;
@@ -375,18 +379,18 @@
       cursor: grab;
       user-select:none;
       gap: 10px;
-      touch-action: none;
+      line-height: 1.05;
     }
 
     #fpTitle{
-      font-weight: 600;
+      font-weight: 650;
       font-size: 1rem;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
       flex: 1 1 auto;
       min-width: 0;
-      line-height: 1.05;
+      line-height: 1.12;
     }
 
     #fpHeaderRight{
@@ -454,9 +458,7 @@
       box-shadow: 0 0 0 3px rgba(43,124,255,.12) inset;
     }
 
-    #fpBody{
-      padding: 10px 12px 12px 12px;
-    }
+    #fpBody{ padding: 10px 12px 12px 12px; }
 
     #status{
       margin: 8px 2px 0 2px;
@@ -511,8 +513,24 @@
       <button id="resetBtn" type="button">Hepsi</button>
 
       <div class="zoomWrap" aria-label="Görünüm">
-        <button id="zoomOutBtn" class="zoomBtn zoomOut" type="button" aria-label="Küçült">🐜</button>
-        <button id="zoomInBtn"  class="zoomBtn zoomIn"  type="button" aria-label="Büyüt">🐘</button>
+        <button id="zoomOutBtn" class="zoomBtn zoomOut" type="button" aria-label="Küçült">
+          <!-- magnifier-minus -->
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="11" cy="11" r="6"></circle>
+            <path d="M20 20l-3.5-3.5"></path>
+            <path d="M8.5 11h5"></path>
+          </svg>
+        </button>
+
+        <button id="zoomInBtn" class="zoomBtn zoomIn" type="button" aria-label="Büyüt">
+          <!-- magnifier-plus -->
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="11" cy="11" r="6"></circle>
+            <path d="M20 20l-3.5-3.5"></path>
+            <path d="M11 8.5v5"></path>
+            <path d="M8.5 11h5"></path>
+          </svg>
+        </button>
       </div>
     </div>
 
@@ -815,7 +833,7 @@
         .replace(/'/g,"&#39;");
     }
 
-    // ✅ Dr/dr veya Fr/fr öncesi
+    // ✅ Dr/dr veya Fr/fr (noktalı/noktası) öncesi
     function highlightDisease(title){
       const raw = (title ?? "").toString();
       const m = raw.match(/\b(dr|fr)\b\.?/i);
@@ -1381,7 +1399,7 @@
     });
 
     // =========================
-    // Draggable player + clamp (zoom uyumlu)
+    // Draggable player (✅ tüm player sürüklenebilir, kontroller hariç)
     // =========================
     function restorePlayerPos(){
       try{
@@ -1436,15 +1454,23 @@
       savePlayerPos(nx, ny);
     }
 
+    const DRAG_IGNORE_SELECTOR =
+      "button, a, input, textarea, select, option, " +
+      "#fpHeaderRight, .speedWrap, " +
+      ".plyr__controls, .plyr__control, .plyr__progress, .plyr__seek, .plyr__volume, .plyr__time";
+
+    function shouldStartDrag(target){
+      return !(target && target.closest && target.closest(DRAG_IGNORE_SELECTOR));
+    }
+
     let dragging = false;
     let startX = 0, startY = 0, startLeft = 0, startTop = 0;
 
-    fpHeader.addEventListener("pointerdown", (e) => {
-      if (e.target && e.target.closest && e.target.closest("#fpHeaderRight")) return;
+    fp.addEventListener("pointerdown", (e) => {
+      if (!shouldStartDrag(e.target)) return;
 
       dragging = true;
-      fpHeader.setPointerCapture(e.pointerId);
-      fpHeader.style.cursor = "grabbing";
+      fp.setPointerCapture(e.pointerId);
 
       const rect = fp.getBoundingClientRect();
       startX = e.clientX;
@@ -1452,13 +1478,14 @@
       startLeft = rect.left;
       startTop = rect.top;
 
+      fpHeader.style.cursor = "grabbing";
       fp.style.left = startLeft + "px";
       fp.style.top = startTop + "px";
       fp.style.bottom = "auto";
       fp.style.right = "auto";
     });
 
-    fpHeader.addEventListener("pointermove", (e) => {
+    fp.addEventListener("pointermove", (e) => {
       if (!dragging) return;
 
       const dx = e.clientX - startX;
@@ -1485,10 +1512,11 @@
       savePlayerPos(nx, ny);
     });
 
-    fpHeader.addEventListener("pointerup", (e) => {
+    fp.addEventListener("pointerup", (e) => {
+      if (!dragging) return;
       dragging = false;
       fpHeader.style.cursor = "grab";
-      try { fpHeader.releasePointerCapture(e.pointerId); } catch {}
+      try { fp.releasePointerCapture(e.pointerId); } catch {}
       clampPlayerToViewport();
     });
 
