@@ -13,7 +13,8 @@
       --muted:#6b6b6b;
       --bg:#ffffff;
       --hover:#f7f7f7;
-      --active:#e8f3ff;
+      --active:#d6ecff;          /* daha fosforlu */
+      --activeGlow: 0 0 0 2px rgba(43,124,255,.28) inset, 0 10px 22px rgba(43,124,255,.10);
       --shadow: 0 12px 30px rgba(0,0,0,.12);
       --blue:#2b7cff;
     }
@@ -181,9 +182,23 @@
     .itemRow:hover{
       background: var(--hover);
     }
-    .itemRow.active{
-      background: var(--active);
-    }
+   .itemRow.active{
+  background: var(--active) !important;
+  box-shadow: var(--activeGlow);
+  position: relative;
+}
+
+/* sol fosfor şerit */
+.itemRow.active::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  bottom:0;
+  width:4px;
+  background: var(--blue);
+  border-radius: 4px;
+}
 
     .title{
       font-size: 1.02rem;
