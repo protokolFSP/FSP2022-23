@@ -13,15 +13,10 @@
       --muted:#6b6b6b;
       --bg:#ffffff;
       --hover:#f7f7f7;
-
-      --active:#cfe9ff;
-      --activeGlow: 0 0 0 2px rgba(43,124,255,.34) inset, 0 12px 26px rgba(43,124,255,.14);
-
-      --shadow: 0 12px 30px rgba(0,0,0,.12);
+      --active:#e8f3ff;
 
       --blue:#2b7cff;
       --blueGlow: 0 0 0 4px rgba(43,124,255,.24), 0 10px 22px rgba(43,124,255,.10);
-
       --green:#16a34a;
       --greenGlow: 0 0 0 4px rgba(22,163,74,.22), 0 10px 22px rgba(22,163,74,.10);
     }
@@ -182,7 +177,7 @@
       line-height: 1.05;
     }
 
-    /* ✅ EN ÇOK DİNLENEN / İNDİRİLEN (DL/PL HIT) */
+    /* ✅ DL/PL HIT (Güncel gibi: iki kart yan yana, dar ekranda alta kırılır) */
     .tops{
       display:flex;
       gap: 12px;
@@ -193,9 +188,9 @@
       flex: 1 1 360px;
       border: 1px solid var(--border);
       border-radius: 14px;
-      background: #fff;
-      box-shadow: 0 10px 22px rgba(0,0,0,.05);
+      background: white;
       overflow: hidden;
+      box-shadow: 0 10px 22px rgba(0,0,0,.05);
     }
     .topHead{
       padding: 10px 12px;
@@ -220,10 +215,7 @@
       text-align:left;
       line-height: 1.05;
     }
-    .topItem:hover{
-      background: var(--hover);
-      border-color: #e6e6e6;
-    }
+    .topItem:hover{ background: var(--hover); border-color:#e6e6e6; }
     .topTitle{
       flex: 1 1 auto;
       min-width: 0;
@@ -301,39 +293,17 @@
       box-shadow: 0 0 0 3px rgba(43,124,255,.12) inset;
     }
 
-    #list{
-      border-bottom: 1px solid var(--border);
-    }
+    #list{ border-bottom: 1px solid var(--border); }
 
-    /* Zebra */
+    /* ✅ Güncel gibi düz liste (zebra yok) */
     .itemRow{
       padding: 4px 8px;
-      border-bottom: 1px solid #ececec;
+      border-bottom: 1px solid #f2f2f2;
       cursor: pointer;
-      background: #f7f7f7;
-    }
-    #list .itemRow:nth-child(even){
-      background: #eeeeee;
+      background: transparent;
     }
     .itemRow:hover{ background: var(--hover); }
-
-    /* Aktif satır */
-    .itemRow.active{
-      background: var(--active) !important;
-      box-shadow: var(--activeGlow);
-      position: relative;
-    }
-    .itemRow.active:hover{ background: var(--active) !important; }
-    .itemRow.active::before{
-      content:"";
-      position:absolute;
-      left:0;
-      top:0;
-      bottom:0;
-      width:4px;
-      background: var(--blue);
-      border-radius: 4px;
-    }
+    .itemRow.active{ background: var(--active); }
 
     .title{
       font-size: 1.02rem;
@@ -354,12 +324,7 @@
 
     @media (max-width: 680px){
       body{ margin: 14px; }
-      .headerRow, .itemRow{ grid-template-columns: minmax(0, 1fr) 8ch 36px 36px 36px; }
-      .title{
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
+      .title{ white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       #search{ flex: 1 1 100%; }
       .zoomWrap{ margin-left: 0; }
     }
@@ -374,10 +339,9 @@
       align-items:center;
       justify-content:center;
       cursor: pointer;
-      flex: 0 0 auto;
       user-select:none;
-      justify-self: center;
       transition: box-shadow .15s ease, border-color .15s ease, background .15s ease;
+      justify-self: center;
     }
     .iconBtn:hover{ background: var(--hover); }
 
@@ -416,7 +380,7 @@
     }
     .filterBtn svg{ width:14px; height:14px; }
 
-    /* ✅ Floating player: belirgin border + asimetrik shadow */
+    /* Floating player */
     #floatingPlayer{
       position: fixed;
       left: max(18px, env(safe-area-inset-left));
@@ -471,17 +435,12 @@
         inset 0 -1px 0 rgba(0,0,0,.04);
     }
 
-    /* ✅ Emboss çizgi */
     #fpHeader::after{
       content:"";
       position:absolute;
       left:0; right:0; bottom:0;
       height: 2px;
-      background: linear-gradient(
-        to bottom,
-        rgba(0,0,0,.18),
-        rgba(255,255,255,.80)
-      );
+      background: linear-gradient(to bottom, rgba(0,0,0,.18), rgba(255,255,255,.80));
     }
 
     #fpTitle{
@@ -607,6 +566,7 @@
   <div id="appScale">
     <h1 class="pageTitle">Alfabetik 2021–23 FSP A–Z</h1>
 
+    <!-- NAV sırası bozulmadı -->
     <nav class="navRow" aria-label="Sayfalar">
       <a class="navLink" href="https://protokolfsp.github.io/fsp-audio/">Güncel</a>
       <a class="navLink" href="https://protokolfsp.github.io/FSP2022-23/">2021–23</a>
@@ -641,14 +601,13 @@
 
     <div id="meta">Görünən: 0 / Toplam: 0</div>
 
-    <!-- ✅ DL/PL HIT -->
+    <!-- DL/PL HIT -->
     <div class="tops" aria-label="İstatistikler">
-      <div class="topCard" id="topPlaysCard">
+      <div class="topCard">
         <div class="topHead">En çok dinlenenler</div>
         <div class="topList" id="topPlays"></div>
       </div>
-
-      <div class="topCard" id="topDownloadsCard">
+      <div class="topCard">
         <div class="topHead">En çok indirilenler</div>
         <div class="topList" id="topDownloads"></div>
       </div>
@@ -794,7 +753,6 @@
       speed: "fsp.speed.v1",
       zoom:  "fsp.ui.zoom.v1",
 
-      // ✅ HIT
       plays: `fsp.hits.plays.${ARCHIVE_ID}.v1`,
       dls:   `fsp.hits.dls.${ARCHIVE_ID}.v1`
     };
@@ -806,7 +764,6 @@
     let sels  = loadMap(LS.sels);
     let durs  = loadMap(LS.durs);
 
-    // ✅ HIT maps
     let plays = loadMap(LS.plays);
     let dls   = loadMap(LS.dls);
 
@@ -963,7 +920,6 @@
         .replace(/'/g,"&#39;");
     }
 
-    // ✅ Dr/dr veya Fr/fr (noktalı/noktası) öncesi, boşluğu korur
     function highlightDisease(title){
       const raw = (title ?? "").toString();
       const m = raw.match(/\b(dr|fr)\b\.?/i);
@@ -1088,7 +1044,7 @@
     });
 
     // =========================
-    // ✅ HIT (DL / PL)
+    // HIT (DL/PL)
     // =========================
     function bump(map, id){
       const v = Number(map[id] || 0);
@@ -1123,7 +1079,6 @@
         for (const [id, c] of topP){
           const it = getItemById(id);
           if (!it) continue;
-
           const btn = document.createElement("button");
           btn.type = "button";
           btn.className = "topItem";
@@ -1137,10 +1092,8 @@
           k.className = "topCount";
           k.textContent = `${c}`;
 
-          btn.appendChild(t);
-          btn.appendChild(k);
+          btn.appendChild(t); btn.appendChild(k);
           btn.addEventListener("click", () => playById(it.id));
-
           topPlaysEl.appendChild(btn);
         }
       }
@@ -1154,7 +1107,6 @@
         for (const [id, c] of topD){
           const it = getItemById(id);
           if (!it) continue;
-
           const btn = document.createElement("button");
           btn.type = "button";
           btn.className = "topItem";
@@ -1168,21 +1120,15 @@
           k.className = "topCount";
           k.textContent = `${c}`;
 
-          btn.appendChild(t);
-          btn.appendChild(k);
-          btn.addEventListener("click", (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            doDownload(it);
-          });
-
+          btn.appendChild(t); btn.appendChild(k);
+          btn.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); doDownload(it); });
           topDownloadsEl.appendChild(btn);
         }
       }
     }
 
     // =========================
-    // DURATION LOADER
+    // Duration loader
     // =========================
     const durQueue = [];
     const durLoading = new Set();
@@ -1255,14 +1201,12 @@
         a.addEventListener("loadedmetadata", onMeta, { once: true });
         a.addEventListener("error", onErr, { once: true });
 
-        setTimeout(() => {
-          if (!done) finish(false, new Error("timeout"));
-        }, 12000);
+        setTimeout(() => { if (!done) finish(false, new Error("timeout")); }, 12000);
       });
     }
 
     // =========================
-    // DOWNLOAD (worker) – All-in-One ile aynı mantık
+    // DOWNLOAD (worker) – Güncel/All-in-One ile aynı
     // =========================
     function makeProxyUrl(fileUrl, filename){
       const u = DL_PROXY + "?u=" + encodeURIComponent(fileUrl);
@@ -1282,10 +1226,7 @@
 
     async function forceDownload(fileUrl, filename){
       const proxied = makeProxyUrl(fileUrl, filename);
-      try{
-        clickDownload(proxied, filename);
-        return;
-      }catch{}
+      try{ clickDownload(proxied, filename); return; }catch{}
 
       try{
         const res = await fetch(proxied, { mode: "cors", cache: "no-store" });
@@ -1307,13 +1248,12 @@
     }
 
     function doDownload(it){
-      const fileUrl = urlFor(it);
-      const filename = safeFilenameFrom(it);
-
       bump(dls, it.id);
       saveMap(LS.dls, dls);
       renderTops();
 
+      const fileUrl = urlFor(it);
+      const filename = safeFilenameFrom(it);
       forceDownload(fileUrl, filename);
     }
 
@@ -1502,7 +1442,6 @@
         listEl.appendChild(row);
       }
 
-      // ✅ HIT kartları
       renderTops();
     }
 
@@ -1535,7 +1474,7 @@
     }
 
     // =========================
-    // Playback + ✅ play hit
+    // Playback (✅ play hit)
     // =========================
     let pendingPlayCountId = null;
 
@@ -1564,8 +1503,6 @@
       statusEl.textContent = "";
       activeId = it.id;
       fpTitle.textContent = it.title;
-
-      // ✅ bu seçimde ilk "playing" anında say
       pendingPlayCountId = it.id;
 
       render();
@@ -1664,7 +1601,7 @@
     });
 
     // =========================
-    // DRAGGABLE PLAYER (tüm player) + clamp (zoom uyumlu) + drag sonrası click iptal
+    // DRAGGABLE PLAYER (tüm player) + clamp (zoom uyumlu)
     // =========================
     function restorePlayerPos(){
       try{
@@ -1821,7 +1758,7 @@
       });
     })();
 
-    // Boot
+    // INIT
     setSortIcons();
     restorePlayerPos();
     restoreSpeed();
