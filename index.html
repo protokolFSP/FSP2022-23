@@ -3,7 +3,27 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>2021–23 Alfabetik FSP A–Z</title>
+  <title>FSP Audio — 2021–23</title>
+
+  <meta name="description" content="FSP Audio — 2021–23 kayıt listesi ve oynatıcı." />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="FSP Audio — 2021–23" />
+  <meta property="og:description" content="2021–23 FSP kayıtları..." />
+  <meta property="og:url" content="https://protokolfsp.github.io/FSP2022-23/" />
+  <meta property="og:image" content="https://protokolfsp.github.io/fsp-audio/og-home.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://protokolfsp.github.io/fsp-audio/og-home.png" />
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TNRQ49C157"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    const __isDebug = new URLSearchParams(location.search).has('debug');
+    gtag('config', 'G-TNRQ49C157', { debug_mode: __isDebug, send_page_view: true });
+  </script>
 
   <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
 
@@ -13,21 +33,41 @@
       --muted:#6b6b6b;
       --bg:#ffffff;
       --hover:#f7f7f7;
-      --active:#e8f3ff;
+
+      --active:#cfe9ff;
+      --activeGlow: 0 0 0 2px rgba(43,124,255,.34) inset, 0 12px 26px rgba(43,124,255,.14);
 
       --blue:#2b7cff;
       --blueGlow: 0 0 0 4px rgba(43,124,255,.24), 0 10px 22px rgba(43,124,255,.10);
+
       --green:#16a34a;
       --greenGlow: 0 0 0 4px rgba(22,163,74,.22), 0 10px 22px rgba(22,163,74,.10);
+
+      --orange:#f59e0b;
+    }
+
+    html, body{
+      height: 100%;
+      overscroll-behavior-y: none;
+      background: var(--bg);
     }
 
     body{
+      margin: 0;
+      overflow: hidden;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      margin: 18px;
-      max-width: 980px;
       color:#111;
-      background: var(--bg);
       line-height: 1.10;
+    }
+
+    #scrollArea{
+      height: 100%;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-y: contain;
+      padding: 18px;
+      max-width: 980px;
+      margin: 0 auto;
     }
 
     #appScale{
@@ -45,7 +85,6 @@
       margin-bottom: 14px;
     }
 
-    /* NAV */
     .navRow{
       display:flex;
       gap:10px;
@@ -104,7 +143,6 @@
     }
     #resetBtn:hover{ background: var(--hover); }
 
-    /* Zoom (SVG) */
     .zoomWrap{
       display:flex;
       align-items:center;
@@ -177,72 +215,9 @@
       line-height: 1.05;
     }
 
-    /* ✅ DL/PL HIT (Güncel gibi: iki kart yan yana, dar ekranda alta kırılır) */
-    .tops{
-      display:flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin: 0 0 12px 0;
-    }
-    .topCard{
-      flex: 1 1 360px;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      background: white;
-      overflow: hidden;
-      box-shadow: 0 10px 22px rgba(0,0,0,.05);
-    }
-    .topHead{
-      padding: 10px 12px;
-      font-weight: 700;
-      color: #0b5fff;
-      background: #f6f9ff;
-      border-bottom: 1px solid var(--border);
-      line-height: 1.05;
-    }
-    .topList{ padding: 6px; }
-    .topItem{
-      width: 100%;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 10px;
-      padding: 8px 10px;
-      border-radius: 12px;
-      border: 1px solid transparent;
-      background: white;
-      cursor: pointer;
-      text-align:left;
-      line-height: 1.05;
-    }
-    .topItem:hover{ background: var(--hover); border-color:#e6e6e6; }
-    .topTitle{
-      flex: 1 1 auto;
-      min-width: 0;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      font-size: .98rem;
-      font-weight: 520;
-    }
-    .topCount{
-      flex: 0 0 auto;
-      font-variant-numeric: tabular-nums;
-      color: var(--muted);
-      font-size: .92rem;
-      white-space: nowrap;
-    }
-    .topEmpty{
-      padding: 10px 12px;
-      color: var(--muted);
-      font-size: .95rem;
-      line-height: 1.05;
-    }
-
-    /* Grid: Kayıt | Süre | ⭐ | ✓ | ⬇︎ */
     .headerRow, .itemRow{
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 8ch 36px 36px 36px;
+      grid-template-columns: minmax(0, 1fr) 8ch 54px 36px 36px 54px;
       align-items: center;
       column-gap: 8px;
     }
@@ -285,25 +260,67 @@
       cursor:pointer;
       color:#111;
       flex: 0 0 auto;
+      position: relative;
     }
     .sortBtn:hover{ background: var(--hover); }
-    .sortBtn svg{ width:14px; height:14px; }
     .sortBtn.on{
       border-color:var(--blue);
       box-shadow: 0 0 0 3px rgba(43,124,255,.12) inset;
     }
 
-    #list{ border-bottom: 1px solid var(--border); }
+    .sortBtn svg{
+      width: 20px;
+      height: 20px;
+      display: block;
+      flex: 0 0 auto;
+    }
+    .sortBtn .mainIcon{
+      width: 20px;
+      height: 20px;
+    }
+    .sortBtn .dirIcon{
+      position: absolute;
+      right: 4px;
+      bottom: 2px;
+      width: 12px;
+      height: 12px;
+      opacity: .95;
+    }
 
-    /* ✅ Güncel gibi düz liste (zebra yok) */
+    .iconOrange{ fill: var(--orange); }
+    .iconBlue{ fill: var(--blue); }
+
+    #list{
+      border-bottom: 1px solid var(--border);
+    }
+
     .itemRow{
       padding: 4px 8px;
-      border-bottom: 1px solid #f2f2f2;
+      border-bottom: 1px solid #ececec;
       cursor: pointer;
-      background: transparent;
+      background: #f7f7f7;
+    }
+    #list .itemRow:nth-child(even){
+      background: #eeeeee;
     }
     .itemRow:hover{ background: var(--hover); }
-    .itemRow.active{ background: var(--active); }
+
+    .itemRow.active{
+      background: var(--active) !important;
+      box-shadow: var(--activeGlow);
+      position: relative;
+    }
+    .itemRow.active:hover{ background: var(--active) !important; }
+    .itemRow.active::before{
+      content:"";
+      position:absolute;
+      left:0;
+      top:0;
+      bottom:0;
+      width:4px;
+      background: var(--blue);
+      border-radius: 4px;
+    }
 
     .title{
       font-size: 1.02rem;
@@ -322,9 +339,25 @@
       line-height: 1.00;
     }
 
+    .countCell{
+      text-align: right;
+      color: #404040;
+      font-variant-numeric: tabular-nums;
+      font-size: .92rem;
+      user-select:none;
+      white-space: nowrap;
+      line-height: 1.00;
+      padding-right: 2px;
+    }
+
     @media (max-width: 680px){
-      body{ margin: 14px; }
-      .title{ white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      #scrollArea{ padding: 14px; }
+      .headerRow, .itemRow{ grid-template-columns: minmax(0, 1fr) 8ch 46px 34px 34px 46px; }
+      .title{
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
       #search{ flex: 1 1 100%; }
       .zoomWrap{ margin-left: 0; }
     }
@@ -380,7 +413,6 @@
     }
     .filterBtn svg{ width:14px; height:14px; }
 
-    /* Floating player */
     #floatingPlayer{
       position: fixed;
       left: max(18px, env(safe-area-inset-left));
@@ -440,7 +472,11 @@
       position:absolute;
       left:0; right:0; bottom:0;
       height: 2px;
-      background: linear-gradient(to bottom, rgba(0,0,0,.18), rgba(255,255,255,.80));
+      background: linear-gradient(
+        to bottom,
+        rgba(0,0,0,.18),
+        rgba(255,255,255,.80)
+      );
     }
 
     #fpTitle{
@@ -563,100 +599,97 @@
 </head>
 
 <body>
-  <div id="appScale">
-    <h1 class="pageTitle">Alfabetik 2021–23 FSP A–Z</h1>
+  <div id="scrollArea">
+    <div id="appScale">
+      <h1 class="pageTitle">FSP Audio — 2021–23</h1>
 
-    <!-- NAV sırası bozulmadı -->
-    <nav class="navRow" aria-label="Sayfalar">
-      <a class="navLink" href="https://protokolfsp.github.io/fsp-audio/">Güncel</a>
-      <a class="navLink" href="https://protokolfsp.github.io/FSP2022-23/">2021–23</a>
-      <a class="navLink" href="https://protokolfsp.github.io/All-in-One/">All-in-One</a>
-      <a class="navLink" href="https://protokolfsp.github.io/Tlcfsp/">TLC</a>
-      <a class="navLink" href="https://protokolfsp.github.io/MenschiB/">MenschiB</a>
-    </nav>
+      <nav class="navRow" aria-label="Sayfalar">
+        <a class="navLink" href="https://protokolfsp.github.io/fsp-audio/">Güncel</a>
+        <a class="navLink" href="https://protokolfsp.github.io/FSP2022-23/">2021–23</a>
+        <a class="navLink" href="https://protokolfsp.github.io/All-in-One/">All-in-One</a>
+        <a class="navLink" href="https://protokolfsp.github.io/Tlcfsp/">TLC</a>
+        <a class="navLink" href="https://protokolfsp.github.io/MenschiB/">MenschiB</a>
+      </nav>
 
-    <div class="topbar">
-      <input id="search" type="text" placeholder="Arama (ör. ACS, DM, PAVK)..." />
-      <button id="resetBtn" type="button">Hepsi</button>
+      <div class="topbar">
+        <input id="search" type="text" placeholder="Arama (ör. ACS, DM, PAVK)..." />
+        <button id="resetBtn" type="button">Hepsi</button>
 
-      <div class="zoomWrap" aria-label="Görünüm">
-        <button id="zoomOutBtn" class="zoomBtn zoomOut" type="button" aria-label="Küçült">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <circle cx="11" cy="11" r="6"></circle>
-            <path d="M20 20l-3.5-3.5"></path>
-            <path d="M8.5 11h5"></path>
-          </svg>
-        </button>
+        <div class="zoomWrap" aria-label="Görünüm">
+          <button id="zoomOutBtn" class="zoomBtn zoomOut" type="button" aria-label="Küçült">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="11" cy="11" r="6"></circle>
+              <path d="M20 20l-3.5-3.5"></path>
+              <path d="M8.5 11h5"></path>
+            </svg>
+          </button>
 
-        <button id="zoomInBtn" class="zoomBtn zoomIn" type="button" aria-label="Büyüt">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <circle cx="11" cy="11" r="6"></circle>
-            <path d="M20 20l-3.5-3.5"></path>
-            <path d="M11 8.5v5"></path>
-            <path d="M8.5 11h5"></path>
-          </svg>
-        </button>
-      </div>
-    </div>
-
-    <div id="meta">Görünən: 0 / Toplam: 0</div>
-
-    <!-- DL/PL HIT -->
-    <div class="tops" aria-label="İstatistikler">
-      <div class="topCard">
-        <div class="topHead">En çok dinlenenler</div>
-        <div class="topList" id="topPlays"></div>
-      </div>
-      <div class="topCard">
-        <div class="topHead">En çok indirilenler</div>
-        <div class="topList" id="topDownloads"></div>
-      </div>
-    </div>
-
-    <div class="headerRow">
-      <div class="colTitle">
-        <div class="titleHead">
-          <span>Kayıt</span>
-          <button id="sortDateBtn" class="sortBtn" type="button" title="Tarihe göre sırala (dosya sonu)">
-            <svg id="sortDateIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 5v14"/><path d="M7 14l5 5 5-5"/>
+          <button id="zoomInBtn" class="zoomBtn zoomIn" type="button" aria-label="Büyüt">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="11" cy="11" r="6"></circle>
+              <path d="M20 20l-3.5-3.5"></path>
+              <path d="M11 8.5v5"></path>
+              <path d="M8.5 11h5"></path>
             </svg>
           </button>
         </div>
       </div>
 
-      <div class="colDur" style="text-align:right;">
-        <div class="durHead">
-          <span>Süre</span>
-          <button id="sortDurBtn" class="sortBtn" type="button" title="Süreye göre sırala">
-            <svg id="sortDurIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 5v14"/><path d="M7 14l5 5 5-5"/>
+      <div id="meta">Görünən: 0 / Toplam: 0</div>
+
+      <div class="headerRow">
+        <div class="colTitle">
+          <div class="titleHead">
+            <span>Kayıt</span>
+            <button id="sortDateBtn" class="sortBtn" type="button" title="Tarihe göre sırala (dosya sonu)">
+              <svg id="sortDateIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="colDur" style="text-align:right;">
+          <div class="durHead">
+            <span>Süre</span>
+            <button id="sortDurBtn" class="sortBtn" type="button" title="Süreye göre sırala">
+              <svg id="sortDurIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="headIconCell">
+          <button id="sortPlayBtn" class="sortBtn" type="button" title="Dinlenme sayısına göre sırala">
+            <svg class="mainIcon" viewBox="0 0 24 24" aria-hidden="true">
+              <path class="iconBlue" d="M3 10v4c0 .55.45 1 1 1h3l5 4V5L7 9H4c-.55 0-1 .45-1 1z"/>
+              <path class="iconOrange" d="M16.5 8.5a1 1 0 0 1 1.4.1c1 1.2 1.6 2.7 1.6 4.4s-.6 3.2-1.6 4.4a1 1 0 1 1-1.5-1.3c.7-.9 1.1-2 1.1-3.1s-.4-2.2-1.1-3.1a1 1 0 0 1 .1-1.4z"/>
             </svg>
+            <svg id="sortPlayIcon" class="dirIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"></svg>
+          </button>
+        </div>
+
+        <div class="headIconCell">
+          <button id="filterFav" class="filterBtn" title="Favoriler filtrele" type="button" aria-pressed="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1L12 2z"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="headIconCell" aria-hidden="true"></div>
+
+        <div class="headIconCell">
+          <button id="sortDlCountBtn" class="sortBtn" type="button" title="İndirme sayısına göre sırala">
+            <svg class="mainIcon" viewBox="0 0 24 24" aria-hidden="true">
+              <path class="iconBlue" d="M4 3h12l4 4v14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/>
+              <path class="iconOrange" d="M7 3h8v6H7V3zm4 10.2a3.3 3.3 0 1 0 0 6.6 3.3 3.3 0 0 0 0-6.6z"/>
+            </svg>
+            <svg id="sortDlCountIcon" class="dirIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"></svg>
           </button>
         </div>
       </div>
 
-      <div class="headIconCell">
-        <button id="filterFav" class="filterBtn" title="Favoriler filtrele" type="button" aria-pressed="false">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1L12 2z"/>
-          </svg>
-        </button>
-      </div>
-
-      <div class="headIconCell">
-        <button id="filterSel" class="filterBtn" title="Seçilenler filtrele" type="button" aria-pressed="false">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M20 6L9 17l-5-5"/>
-          </svg>
-        </button>
-      </div>
-
-      <div class="headIconCell" aria-hidden="true"></div>
+      <div id="list"></div>
+      <div id="status"></div>
     </div>
-
-    <div id="list"></div>
-    <div id="status"></div>
   </div>
 
   <div id="floatingPlayer" role="region" aria-label="Oynatıcı">
@@ -670,12 +703,12 @@
         </div>
 
         <button id="prevBtn" class="miniBtn" type="button" title="Önceki">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <path d="M19 20L9 12l10-8v16z"/><path d="M5 19V5"/>
           </svg>
         </button>
         <button id="nextBtn" class="miniBtn" type="button" title="Sonraki">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <path d="M5 4l10 8-10 8V4z"/><path d="M19 5v14"/>
           </svg>
         </button>
@@ -689,23 +722,23 @@
   <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
 
   <script>
-    // =========================
-    // Archive source
-    // =========================
-    const ARCHIVE_ID = "FSP21_23";
-    const BASE = `https://archive.org/download/${ARCHIVE_ID}/`;
+    const IA_IDENTIFIER_1 = "FSP21_23";
     const DL_PROXY = "https://fspdownload.protokolfsp.workers.dev/";
+    const COUNTER_API = "https://fspdlcounter.protokolfsp.workers.dev";
 
-    // =========================
-    // DOM
-    // =========================
+    const IS_SAFARI = (() => {
+      const ua = navigator.userAgent || "";
+      const isApple = /Mac|iPhone|iPad|iPod/i.test(ua);
+      const hasSafari = /Safari/i.test(ua);
+      const notChromeLike = !/Chrome|Chromium|CriOS|FxiOS|EdgiOS|Edg|OPR/i.test(ua);
+      return isApple && hasSafari && notChromeLike;
+    })();
+
+    const scrollArea = document.getElementById("scrollArea");
     const listEl   = document.getElementById("list");
     const searchEl = document.getElementById("search");
     const metaEl   = document.getElementById("meta");
     const statusEl = document.getElementById("status");
-
-    const topPlaysEl = document.getElementById("topPlays");
-    const topDownloadsEl = document.getElementById("topDownloads");
 
     const appScaleEl = document.getElementById("appScale");
     const zoomOutBtn = document.getElementById("zoomOutBtn");
@@ -724,7 +757,7 @@
     const speedValueEl = document.getElementById("speedValue");
 
     const filterFavBtn  = document.getElementById("filterFav");
-    const filterSelBtn  = document.getElementById("filterSel");
+    const filterSelBtn  = document.getElementById("filterSel"); // (DOM'da yok; günceldeki gibi böyle kalır)
     const resetBtn      = document.getElementById("resetBtn");
 
     const sortDurBtn  = document.getElementById("sortDurBtn");
@@ -732,29 +765,179 @@
     const sortDateBtn  = document.getElementById("sortDateBtn");
     const sortDateIcon = document.getElementById("sortDateIcon");
 
+    const sortPlayBtn  = document.getElementById("sortPlayBtn");
+    const sortPlayIcon = document.getElementById("sortPlayIcon");
+    const sortDlCountBtn  = document.getElementById("sortDlCountBtn");
+    const sortDlCountIcon = document.getElementById("sortDlCountIcon");
+
     const plyr = new Plyr(playerEl, {
       seekTime: 5,
       controls: ["rewind","play","fast-forward","progress","current-time","duration","mute","volume"]
     });
 
-    // =========================
-    // LocalStorage keys
-    // =========================
-    const LS = {
-      favs:  "fsp.favs.v1",
-      sels:  "fsp.sels.v1",
-      pos:   "fsp.fp.pos.v1",
-      durs:  "fsp.durs.v1",
-      sortMode: "fsp.sort.mode.v2",
-      sortDirDur: "fsp.sort.dur.dir.v2",
-      sortDirDate: "fsp.sort.date.dir.v2",
-      cacheItems: `fsp.cache.items.${ARCHIVE_ID}.v1`,
-      cacheFp:    `fsp.cache.fp.${ARCHIVE_ID}.v1`,
-      speed: "fsp.speed.v1",
-      zoom:  "fsp.ui.zoom.v1",
+    function gaEvent(name, params = {}) {
+      try {
+        if (typeof gtag !== "function") return;
+        gtag("event", name, { ...params, page_path: location.pathname });
+      } catch {}
+    }
+    function trackAudioPlay(it) {
+      gaEvent("audio_play", {
+        audio_id: it.id,
+        audio_title: it.title,
+        file_name: (it.name || "").split("/").pop() || "",
+        src: it.src || "S1"
+      });
+    }
+    function trackAudioDownload(it, filename) {
+      gaEvent("audio_download", {
+        audio_id: it.id,
+        audio_title: it.title,
+        file_name: filename || (it.name || "").split("/").pop() || "",
+        src: it.src || "S1"
+      });
+    }
 
-      plays: `fsp.hits.plays.${ARCHIVE_ID}.v1`,
-      dls:   `fsp.hits.dls.${ARCHIVE_ID}.v1`
+    let globalPlayCounts = {};
+    let globalDownloadCounts = {};
+
+    function chunk(arr, size){
+      const out = [];
+      for (let i=0; i<arr.length; i+=size) out.push(arr.slice(i, i+size));
+      return out;
+    }
+
+    async function fetchCounts(type, ids){
+      if (!ids.length) return {};
+      try{
+        const res = await fetch(COUNTER_API + "/counts", {
+          method: "POST",
+          mode: "cors",
+          cache: "no-store",
+          headers: {
+            "content-type": IS_SAFARI ? "text/plain;charset=utf-8" : "application/json"
+          },
+          body: JSON.stringify({ type, ids })
+        });
+        if (!res.ok) throw new Error("counts failed");
+        const j = await res.json();
+        return (j && j.counts) ? j.counts : {};
+      }catch{
+        return {};
+      }
+    }
+
+    let refreshCountsTimer = null;
+    function scheduleRefreshCounts(ms = 800){
+      clearTimeout(refreshCountsTimer);
+      refreshCountsTimer = setTimeout(() => refreshAllCounts().catch(()=>{}), ms);
+    }
+
+    async function refreshAllCounts(){
+      if (!items.length) return;
+
+      const ids = items.map(it => it.id);
+      const parts = chunk(ids, 200);
+
+      const playAll = {};
+      const dlAll = {};
+
+      for (const part of parts){
+        const [p, d] = await Promise.all([
+          fetchCounts("play", part),
+          fetchCounts("download", part),
+        ]);
+        Object.assign(playAll, p);
+        Object.assign(dlAll, d);
+      }
+
+      const playHas = Object.keys(playAll).length > 0;
+      const dlHas   = Object.keys(dlAll).length > 0;
+
+      if (!playHas && !dlHas) return;
+
+      if (playHas) globalPlayCounts = playAll;
+      if (dlHas)   globalDownloadCounts = dlAll;
+
+      render();
+    }
+
+    function sendHit(type, it){
+      try{
+        const payload = {
+          type,
+          id: it?.id || "",
+          title: it?.title || "",
+          file_name: (it?.name || "").split("/").pop() || ""
+        };
+
+        const url = COUNTER_API + "/hit";
+        const data = JSON.stringify(payload);
+
+        if (IS_SAFARI && navigator.sendBeacon){
+          const ok = navigator.sendBeacon(
+            url,
+            new Blob([data], { type: "text/plain;charset=utf-8" })
+          );
+          if (ok) return;
+        }
+
+        fetch(url, {
+          method: "POST",
+          mode: "cors",
+          cache: "no-store",
+          keepalive: true,
+          headers: {
+            "content-type": IS_SAFARI ? "text/plain;charset=utf-8" : "application/json"
+          },
+          body: data
+        }).catch(() => {});
+      }catch{}
+    }
+
+    function bumpLocalGlobalCount(type, id){
+      if (!id) return;
+      if (type === "play"){
+        globalPlayCounts[id] = (Number(globalPlayCounts[id]) || 0) + 1;
+      } else {
+        globalDownloadCounts[id] = (Number(globalDownloadCounts[id]) || 0) + 1;
+      }
+    }
+
+    let playGate = { id: null, armed: false, sent: false };
+    function armPlayGate(it){
+      playGate = { id: it?.id || null, armed: true, sent: false };
+    }
+    function trySendPlayOnPlaying(){
+      if (!playGate.armed || playGate.sent || !playGate.id) return;
+      if (!playerEl || playerEl.paused) return;
+
+      playGate.sent = true;
+      const it = items.find(x => x.id === playGate.id) || { id: playGate.id, title:"", name:"" };
+      bumpLocalGlobalCount("play", it.id);
+      sendHit("play", it);
+      scheduleRefreshCounts(1200);
+      render();
+    }
+    playerEl.addEventListener("playing", trySendPlayOnPlaying);
+
+    playerEl.addEventListener("error", () => {
+      const code = playerEl?.error?.code;
+      statusEl.textContent = "Audio hata: " + (code || "bilinmiyor");
+    });
+
+    const LS = {
+      favs:  "fsp1.favs.v1",
+      sels:  "fsp1.sels.v1",
+      pos:   "fsp1.fp.pos.v1",
+      durs:  "fsp1.durs.v1",
+      sortMode: "fsp1.sort.mode.v2",
+      sortDirDur: "fsp1.sort.dur.dir.v1",
+      sortDirDate: "fsp1.sort.date.dir.v1",
+      sortDirPlay: "fsp1.sort.play.dir.v1",
+      sortDirDl:   "fsp1.sort.dl.dir.v1",
+      speed: "fsp1.speed.v1",
+      zoom:  "fsp1.ui.zoom.v1"
     };
 
     const loadMap = (k) => { try { return JSON.parse(localStorage.getItem(k) || "{}"); } catch { return {}; } };
@@ -764,24 +947,24 @@
     let sels  = loadMap(LS.sels);
     let durs  = loadMap(LS.durs);
 
-    let plays = loadMap(LS.plays);
-    let dls   = loadMap(LS.dls);
-
     let filterFav  = false;
     let filterSel  = false;
 
     let items = [];
     let activeId = null;
 
-    let sortMode = localStorage.getItem(LS.sortMode) || "title";
+    let sortMode = localStorage.getItem(LS.sortMode) || "date";
     let durSortDir  = (localStorage.getItem(LS.sortDirDur) === "desc") ? "desc" : "asc";
-    let dateSortDir = (localStorage.getItem(LS.sortDirDate) === "desc") ? "desc" : "asc";
+    let dateSortDir = (localStorage.getItem(LS.sortDirDate) === "asc") ? "asc" : "desc";
+    let playSortDir = (localStorage.getItem(LS.sortDirPlay) === "asc") ? "asc" : "desc";
+    let dlSortDir   = (localStorage.getItem(LS.sortDirDl) === "asc") ? "asc" : "desc";
 
-    let lastFp = localStorage.getItem(LS.cacheFp) || "";
+    if (!localStorage.getItem(LS.sortMode)) localStorage.setItem(LS.sortMode, sortMode);
+    if (!localStorage.getItem(LS.sortDirDate)) localStorage.setItem(LS.sortDirDate, dateSortDir);
 
-    // =========================
-    // SPEED
-    // =========================
+    if (!localStorage.getItem(LS.sortDirPlay)) localStorage.setItem(LS.sortDirPlay, playSortDir);
+    if (!localStorage.getItem(LS.sortDirDl)) localStorage.setItem(LS.sortDirDl, dlSortDir);
+
     const SPEEDS = [0.5, 0.75, 0.9, 1, 1.25, 1.5, 1.75, 2.0, 2.25];
     let speedIndex = SPEEDS.indexOf(1);
 
@@ -820,9 +1003,6 @@
     slowBtn.addEventListener("click", (e) => { e.stopPropagation(); applySpeedByIndex(speedIndex - 1); });
     fastBtn.addEventListener("click", (e) => { e.stopPropagation(); applySpeedByIndex(speedIndex + 1); });
 
-    // =========================
-    // ZOOM (% görünüm) – player dahil + double-tap reset
-    // =========================
     const ZOOMS = [0.85, 0.9, 0.95, 1, 1.05, 1.1, 1.15, 1.2];
     let zoomIndex = ZOOMS.indexOf(1);
     let uiScale = 1;
@@ -874,13 +1054,10 @@
       }
     }
 
-    function resetZoom100(){
-      applyZoomByIndex(ZOOMS.indexOf(1));
-    }
+    function resetZoom100(){ applyZoomByIndex(ZOOMS.indexOf(1)); }
 
     function attachDoubleTapReset(el){
       el.addEventListener("dblclick", (e) => { e.preventDefault(); resetZoom100(); });
-
       let lastTap = 0;
       el.addEventListener("touchend", (e) => {
         const now = Date.now();
@@ -899,18 +1076,10 @@
     attachDoubleTapReset(zoomOutBtn);
     attachDoubleTapReset(zoomInBtn);
 
-    // =========================
-    // SEARCH: player sakla
-    // =========================
-    function setTypingMode(on){
-      fp.classList.toggle("hiddenWhileTyping", !!on);
-    }
+    function setTypingMode(on){ fp.classList.toggle("hiddenWhileTyping", !!on); }
     searchEl.addEventListener("focus", () => setTypingMode(true));
     searchEl.addEventListener("blur",  () => setTypingMode(false));
 
-    // =========================
-    // Helpers
-    // =========================
     function escHtml(s){
       return (s ?? "").toString()
         .replace(/&/g,"&amp;")
@@ -934,18 +1103,13 @@
       return `<span class="diseaseName">${escHtml(leftTrim)}</span>${escHtml(trailing)}${escHtml(raw.slice(i))}`;
     }
 
-    function normTR(s){
-      return (s || "")
-        .toLocaleLowerCase("tr")
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/ı/g, "i")
-        .replace(/İ/g, "i")
-        .replace(/ü/g, "u")
-        .replace(/ö/g, "o")
-        .replace(/ş/g, "s")
-        .replace(/ç/g, "c")
-        .replace(/ğ/g, "g");
+    function foldTR(s){
+      s = (s || "").toString();
+      s = s.toLocaleLowerCase("tr");
+      s = s.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      s = s.replace(/ı/g, "i");
+      s = s.replace(/\s+/g, " ").trim();
+      return s;
     }
 
     function guessMime(url){
@@ -955,12 +1119,6 @@
         if (p.endsWith(".m4a")) return "audio/mp4";
       }catch{}
       return "audio/*";
-    }
-
-    function urlFor(item){
-      if (item.url) return item.url;
-      const file = item.file || item.name || item.title || "";
-      return new URL(file, BASE).toString();
     }
 
     function fmtDur(sec){
@@ -975,16 +1133,17 @@
       return `${m}:${ss}`;
     }
 
-    function parseEndDate(item){
-      const raw0 = (item.file || item.title || "").toString();
-      const lastPart = raw0.split("/").pop() || raw0;
+    function decodeURIComponentSafe(s){
+      try { return decodeURIComponent(s); } catch { return s; }
+    }
 
+    function parseEndDate(item){
+      const raw0 = (item.name || item.file || item.title || "").toString();
       let s;
-      try { s = decodeURIComponent(lastPart); } catch { s = lastPart; }
+      try { s = decodeURIComponent(raw0.split("/").pop() || raw0); } catch { s = raw0; }
 
       s = s.replace(/\.(mp3|m4a|wav|aac|ogg|flac)$/i, "").trim();
-      s = s.normalize("NFKC");
-      s = s.replace(/\u00A0/g, " ");
+      s = s.normalize("NFKC").replace(/\u00A0/g, " ").trim();
       s = s.trim().replace(/[)\]\s]+$/g, "").trim();
 
       const m = s.match(/(\d{1,2})[.\-_\u00B7](\d{1,2})[.\-_\u00B7](\d{2}|\d{4})\s*$/);
@@ -994,7 +1153,6 @@
       const mm = Number(m[2]);
       let yy = Number(m[3]);
       if (yy < 100) yy = 2000 + yy;
-
       if (!(dd >= 1 && dd <= 31 && mm >= 1 && mm <= 12)) return null;
 
       const t = Date.UTC(yy, mm - 1, dd);
@@ -1002,25 +1160,49 @@
 
       const d = new Date(t);
       if (d.getUTCFullYear() !== yy || (d.getUTCMonth() + 1) !== mm || d.getUTCDate() !== dd) return null;
-
       return t;
     }
 
-    function arrowSvg(isAsc){
-      return isAsc
-        ? `<path d="M12 19V5"/><path d="M7 10l5-5 5 5"/>`
-        : `<path d="M12 5v14"/><path d="M7 14l5 5 5-5"/>`;
+    function setArrowIcon(svgEl, isAsc) {
+      if (!svgEl) return;
+      while (svgEl.firstChild) svgEl.removeChild(svgEl.firstChild);
+
+      const ns = "http://www.w3.org/2000/svg";
+
+      const mkPath = (d) => {
+        const p = document.createElementNS(ns, "path");
+        p.setAttribute("d", d);
+        p.setAttribute("fill", "none");
+        p.setAttribute("stroke", "currentColor");
+        p.setAttribute("stroke-width", "2");
+        p.setAttribute("stroke-linecap", "round");
+        p.setAttribute("stroke-linejoin", "round");
+        return p;
+      };
+
+      svgEl.setAttribute("viewBox", "0 0 24 24");
+      svgEl.setAttribute("aria-hidden", "true");
+      svgEl.setAttribute("focusable", "false");
+
+      svgEl.appendChild(mkPath(isAsc ? "M12 19V5" : "M12 5v14"));
+      svgEl.appendChild(mkPath(isAsc ? "M7 10l5-5 5 5" : "M7 14l5 5 5-5"));
     }
 
     function setSortIcons(){
       sortDurBtn.classList.remove("on");
       sortDateBtn.classList.remove("on");
+      sortPlayBtn.classList.remove("on");
+      sortDlCountBtn.classList.remove("on");
 
-      sortDurIcon.innerHTML = arrowSvg(durSortDir === "asc");
-      sortDateIcon.innerHTML = arrowSvg(dateSortDir === "asc");
+      setArrowIcon(sortDurIcon, durSortDir === "asc");
+      setArrowIcon(sortDateIcon, dateSortDir === "asc");
+      setArrowIcon(sortPlayIcon, playSortDir === "asc");
+      setArrowIcon(sortDlCountIcon, dlSortDir === "asc");
 
       if (sortMode === "dur") sortDurBtn.classList.add("on");
       if (sortMode === "date") sortDateBtn.classList.add("on");
+      if (sortMode === "play") sortPlayBtn.classList.add("on");
+      if (sortMode === "download") sortDlCountBtn.classList.add("on");
     }
 
     sortDurBtn.addEventListener("click", (e) => {
@@ -1043,93 +1225,26 @@
       render();
     });
 
-    // =========================
-    // HIT (DL/PL)
-    // =========================
-    function bump(map, id){
-      const v = Number(map[id] || 0);
-      map[id] = (Number.isFinite(v) ? v : 0) + 1;
-    }
+    sortPlayBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (sortMode !== "play") sortMode = "play";
+      else playSortDir = (playSortDir === "asc") ? "desc" : "asc";
+      localStorage.setItem(LS.sortMode, sortMode);
+      localStorage.setItem(LS.sortDirPlay, playSortDir);
+      setSortIcons();
+      render();
+    });
 
-    function topIds(map, limit){
-      return Object.entries(map)
-        .map(([id, c]) => [id, Number(c) || 0])
-        .filter(([,c]) => c > 0)
-        .sort((a,b) => (b[1]-a[1]) || String(a[0]).localeCompare(String(b[0])))
-        .slice(0, limit);
-    }
+    sortDlCountBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (sortMode !== "download") sortMode = "download";
+      else dlSortDir = (dlSortDir === "asc") ? "desc" : "asc";
+      localStorage.setItem(LS.sortMode, sortMode);
+      localStorage.setItem(LS.sortDirDl, dlSortDir);
+      setSortIcons();
+      render();
+    });
 
-    function getItemById(id){
-      return items.find(x => x.id === id) || null;
-    }
-
-    function renderTops(){
-      const topP = topIds(plays, 10);
-      const topD = topIds(dls, 10);
-
-      topPlaysEl.innerHTML = "";
-      topDownloadsEl.innerHTML = "";
-
-      if (!topP.length){
-        const d = document.createElement("div");
-        d.className = "topEmpty";
-        d.textContent = "Henüz dinleme yok.";
-        topPlaysEl.appendChild(d);
-      } else {
-        for (const [id, c] of topP){
-          const it = getItemById(id);
-          if (!it) continue;
-          const btn = document.createElement("button");
-          btn.type = "button";
-          btn.className = "topItem";
-          btn.title = it.title;
-
-          const t = document.createElement("div");
-          t.className = "topTitle";
-          t.textContent = it.title;
-
-          const k = document.createElement("div");
-          k.className = "topCount";
-          k.textContent = `${c}`;
-
-          btn.appendChild(t); btn.appendChild(k);
-          btn.addEventListener("click", () => playById(it.id));
-          topPlaysEl.appendChild(btn);
-        }
-      }
-
-      if (!topD.length){
-        const d = document.createElement("div");
-        d.className = "topEmpty";
-        d.textContent = "Henüz indirme yok.";
-        topDownloadsEl.appendChild(d);
-      } else {
-        for (const [id, c] of topD){
-          const it = getItemById(id);
-          if (!it) continue;
-          const btn = document.createElement("button");
-          btn.type = "button";
-          btn.className = "topItem";
-          btn.title = it.title;
-
-          const t = document.createElement("div");
-          t.className = "topTitle";
-          t.textContent = it.title;
-
-          const k = document.createElement("div");
-          k.className = "topCount";
-          k.textContent = `${c}`;
-
-          btn.appendChild(t); btn.appendChild(k);
-          btn.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); doDownload(it); });
-          topDownloadsEl.appendChild(btn);
-        }
-      }
-    }
-
-    // =========================
-    // Duration loader
-    // =========================
     const durQueue = [];
     const durLoading = new Set();
     let durActive = 0;
@@ -1168,7 +1283,7 @@
       return new Promise((resolve, reject) => {
         const a = new Audio();
         a.preload = "metadata";
-        a.src = urlFor(it);
+        a.src = it.url;
 
         let done = false;
 
@@ -1201,13 +1316,12 @@
         a.addEventListener("loadedmetadata", onMeta, { once: true });
         a.addEventListener("error", onErr, { once: true });
 
-        setTimeout(() => { if (!done) finish(false, new Error("timeout")); }, 12000);
+        setTimeout(() => {
+          if (!done) finish(false, new Error("timeout"));
+        }, 12000);
       });
     }
 
-    // =========================
-    // DOWNLOAD (worker) – Güncel/All-in-One ile aynı
-    // =========================
     function makeProxyUrl(fileUrl, filename){
       const u = DL_PROXY + "?u=" + encodeURIComponent(fileUrl);
       return filename ? (u + "&f=" + encodeURIComponent(filename)) : u;
@@ -1217,7 +1331,7 @@
       const a = document.createElement("a");
       a.href = href;
       a.rel = "noopener";
-      a.target = "_self";
+      a.target = "_blank";
       if (filename) a.download = filename;
       document.body.appendChild(a);
       a.click();
@@ -1226,7 +1340,10 @@
 
     async function forceDownload(fileUrl, filename){
       const proxied = makeProxyUrl(fileUrl, filename);
-      try{ clickDownload(proxied, filename); return; }catch{}
+      try{
+        clickDownload(proxied, filename);
+        return;
+      }catch{}
 
       try{
         const res = await fetch(proxied, { mode: "cors", cache: "no-store" });
@@ -1234,111 +1351,59 @@
         const blob = await res.blob();
         const url = URL.createObjectURL(blob);
         clickDownload(url, filename);
-        setTimeout(() => URL.revokeObjectURL(url), 60000);
+        setTimeout(() => URL.revokeObjectURL(url), 60_000);
       }catch{
         window.location.href = fileUrl;
       }
     }
 
-    function safeFilenameFrom(it){
-      const raw = (it.file || it.title || "audio").toString();
-      const base = (raw.split("/").pop() || raw).replace(/[\\/:*?"<>|]+/g, "_");
-      const ext = base.toLowerCase().endsWith(".mp3") || base.toLowerCase().endsWith(".m4a") ? "" : ".mp3";
-      return base + ext;
-    }
-
-    function doDownload(it){
-      bump(dls, it.id);
-      saveMap(LS.dls, dls);
-      renderTops();
-
-      const fileUrl = urlFor(it);
-      const filename = safeFilenameFrom(it);
-      forceDownload(fileUrl, filename);
-    }
-
-    // =========================
-    // Archive list fetch + cache
-    // =========================
-    function makeFingerprint(list){
-      return list.map(x => x.file).sort().join("|");
-    }
-
-    function loadFromCache(){
-      try{
-        const raw = localStorage.getItem(LS.cacheItems);
-        if(!raw) return false;
-        const cached = JSON.parse(raw);
-        if(!Array.isArray(cached)) return false;
-        items = cached;
-        render();
-        return true;
-      }catch{ return false; }
-    }
-
-    async function fetchFromArchive(){
-      const metaUrl = `https://archive.org/metadata/${ARCHIVE_ID}?_=${Date.now()}`;
-      const res = await fetch(metaUrl, { cache: "no-store" });
-      if(!res.ok) throw new Error("metadata okunamadı");
-      const data = await res.json();
-
-      const files = Array.isArray(data.files) ? data.files : [];
-      const newItems = files
-        .filter(f => {
-          const name = (f.name || "").toLowerCase();
-          return name.endsWith(".mp3") || name.endsWith(".m4a");
-        })
-        .map((f, idx) => {
-          const file = f.name || "";
-          const title =
-            (f.title && String(f.title).trim()) ||
-            (() => { try { return decodeURIComponent(file.split("/").pop() || file); } catch { return (file.split("/").pop() || file); } })() ||
-            ("Kayıt " + (idx + 1));
-
-          const url = `https://archive.org/download/${ARCHIVE_ID}/${encodeURIComponent(file).replace(/%2F/g, "/")}`;
-          const id = file || title;
-          return { id, title, file, url };
-        })
-        .sort((a,b) => a.title.localeCompare(b.title, "tr"));
-
-      const fp = makeFingerprint(newItems);
-      if (fp === lastFp && items.length) return false;
-
-      items = newItems;
-      lastFp = fp;
-
-      localStorage.setItem(LS.cacheFp, fp);
-      localStorage.setItem(LS.cacheItems, JSON.stringify(items));
-
-      render();
-      return true;
+    function buildDownloadUrl(identifier, name){
+      const parts = (name || "").split("/").map(p => encodeURIComponent(p));
+      return `https://archive.org/download/${identifier}/${parts.join("/")}`;
     }
 
     async function loadItems(){
       statusEl.textContent = "Yükleniyor...";
 
-      const hadCache = loadFromCache();
-      if (hadCache) statusEl.textContent = "Güncelleniyor...";
-
       try{
-        await fetchFromArchive();
-        statusEl.textContent = "";
+        const metaUrl = `https://archive.org/metadata/${encodeURIComponent(IA_IDENTIFIER_1)}?v=${Date.now()}`;
+        const res = await fetch(metaUrl, { cache: "no-store" });
+        if (!res.ok) throw new Error("IA metadata okunamadı");
+        const j = await res.json();
+
+        const files = Array.isArray(j.files) ? j.files : [];
+        const list = files
+          .filter(f => {
+            const name = (f.name || "").toLowerCase();
+            if (!(name.endsWith(".m4a") || name.endsWith(".mp3"))) return false;
+            if (!("source" in f)) return true;
+            return (String(f.source).toLowerCase() === "original");
+          })
+          .map((f, idx) => {
+            const name = f.name || "";
+            const title = (f.title || "").trim() || decodeURIComponentSafe(name.split("/").pop() || name);
+            const url = buildDownloadUrl(IA_IDENTIFIER_1, name);
+            const localId = name || url || (title + "#" + idx);
+            const id = "S1|" + localId;
+            return { id, title, name, url, src: "S1" };
+          });
+
+        items = list;
+        statusEl.textContent = items.length ? "" : "Kayıt bulunamadı.";
+        setSortIcons();
+        render();
+        scheduleRefreshCounts(100);
       }catch(err){
         console.error(err);
-        statusEl.textContent = hadCache ? "" : "Arşivden kayıtlar çekilemedi.";
+        statusEl.textContent = "Liste yüklenemedi.";
       }
-
-      setInterval(() => { fetchFromArchive().catch(() => {}); }, 180000);
     }
 
-    // =========================
-    // Filtering + sorting
-    // =========================
     function getVisibleItems(){
-      const q = normTR((searchEl.value || "").trim());
+      const q = foldTR((searchEl.value || "").trim());
 
       let arr = items.filter(it => {
-        if (q && !normTR(it.title).includes(q)) return false;
+        if (q && !foldTR(it.title).includes(q)) return false;
         if (filterFav && !favs[it.id]) return false;
         if (filterSel && !sels[it.id]) return false;
         return true;
@@ -1368,6 +1433,22 @@
           if (ha && hb && ta !== tb) return (ta - tb) * dir;
           return a.title.localeCompare(b.title, "tr");
         });
+      } else if (sortMode === "play"){
+        const dir = (playSortDir === "asc") ? 1 : -1;
+        arr.sort((a,b) => {
+          const ca = Number(globalPlayCounts[a.id]) || 0;
+          const cb = Number(globalPlayCounts[b.id]) || 0;
+          if (ca !== cb) return (ca - cb) * dir;
+          return a.title.localeCompare(b.title, "tr");
+        });
+      } else if (sortMode === "download"){
+        const dir = (dlSortDir === "asc") ? 1 : -1;
+        arr.sort((a,b) => {
+          const ca = Number(globalDownloadCounts[a.id]) || 0;
+          const cb = Number(globalDownloadCounts[b.id]) || 0;
+          if (ca !== cb) return (ca - cb) * dir;
+          return a.title.localeCompare(b.title, "tr");
+        });
       } else {
         arr.sort((a,b) => a.title.localeCompare(b.title, "tr"));
       }
@@ -1380,10 +1461,10 @@
       metaEl.textContent = `Görünən: ${visible.length} / Toplam: ${items.length}`;
 
       filterFavBtn.classList.toggle("on", filterFav);
-      filterSelBtn.classList.toggle("on", filterSel);
+      if (filterSelBtn) filterSelBtn.classList.toggle("on", filterSel);
 
       filterFavBtn.setAttribute("aria-pressed",  String(filterFav));
-      filterSelBtn.setAttribute("aria-pressed",  String(filterSel));
+      if (filterSelBtn) filterSelBtn.setAttribute("aria-pressed",  String(filterSel));
 
       listEl.innerHTML = "";
 
@@ -1404,9 +1485,16 @@
         dur.className = "dur";
         dur.textContent = (durs[it.id] > 0) ? fmtDur(durs[it.id]) : "…";
 
+        const playCount = document.createElement("div");
+        playCount.className = "countCell";
+        playCount.textContent = String(Number(globalPlayCounts[it.id]) || 0);
+
         const favBtn = iconButton("star", !!favs[it.id], "Favori");
-        const selBtn = iconButton("check", !!sels[it.id], "Seç");
         const dlBtn  = iconButton("download", false, "İndir");
+
+        const dlCount = document.createElement("div");
+        dlCount.className = "countCell";
+        dlCount.textContent = String(Number(globalDownloadCounts[it.id]) || 0);
 
         favBtn.addEventListener("click", (e) => {
           e.stopPropagation();
@@ -1415,34 +1503,38 @@
           render();
         });
 
-        selBtn.addEventListener("click", (e) => {
-          e.stopPropagation();
-          sels[it.id] = !sels[it.id];
-          saveMap(LS.sels, sels);
-          render();
-        });
-
         dlBtn.addEventListener("click", (e) => {
           e.stopPropagation();
-          doDownload(it);
+          const filename =
+            (it.name || it.file || "").split("/").pop() ||
+            (it.title || "audio").replace(/[\\/:*?"<>|]+/g, "_") + ".m4a";
+
+          forceDownload(it.url, filename);
+
+          setTimeout(() => {
+            bumpLocalGlobalCount("download", it.id);
+            sendHit("download", it);
+            scheduleRefreshCounts(1200);
+            trackAudioDownload(it, filename);
+            render();
+          }, 0);
         });
 
-        for (const b of [favBtn, selBtn, dlBtn]){
+        for (const b of [favBtn, dlBtn]){
           b.addEventListener("pointerup", (e) => e.stopPropagation());
           b.addEventListener("pointerdown", (e) => e.stopPropagation());
         }
 
         row.appendChild(title);
         row.appendChild(dur);
+        row.appendChild(playCount);
         row.appendChild(favBtn);
-        row.appendChild(selBtn);
         row.appendChild(dlBtn);
+        row.appendChild(dlCount);
 
         row.addEventListener("click", () => playById(it.id));
         listEl.appendChild(row);
       }
-
-      renderTops();
     }
 
     function iconButton(kind, on, title){
@@ -1454,39 +1546,25 @@
 
       if (kind === "star"){
         btn.innerHTML = `
-          <svg viewBox="0 0 24 24" fill="${on ? "currentColor" : "none"}" stroke="currentColor" stroke-width="2">
+          <svg viewBox="0 0 24 24" fill="${on ? "currentColor" : "none"}" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1L12 2z"/>
           </svg>`;
       } else if (kind === "check"){
         btn.innerHTML = `
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <path d="M20 6L9 17l-5-5"/>
           </svg>`;
       } else if (kind === "download"){
         btn.innerHTML = `
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <path d="M12 3v12"/>
             <path d="M7 10l5 5 5-5"/>
             <path d="M5 21h14"/>
           </svg>`;
       }
+
       return btn;
     }
-
-    // =========================
-    // Playback (✅ play hit)
-    // =========================
-    let pendingPlayCountId = null;
-
-    plyr.on("playing", () => {
-      if (!pendingPlayCountId) return;
-      if (activeId !== pendingPlayCountId) return;
-
-      bump(plays, activeId);
-      saveMap(LS.plays, plays);
-      pendingPlayCountId = null;
-      renderTops();
-    });
 
     function playById(id){
       const visible = getVisibleItems();
@@ -1495,46 +1573,49 @@
       playAtVisibleIndex(idx);
     }
 
+    function setMediaSource(url, mime){
+      while (playerEl.firstChild) playerEl.removeChild(playerEl.firstChild);
+      const s = document.createElement("source");
+      s.src = url;
+      if (mime) s.type = mime;
+      playerEl.appendChild(s);
+      playerEl.load();
+    }
+
     function playAtVisibleIndex(idx){
       const visible = getVisibleItems();
       const it = visible[idx];
       if (!it) return;
 
+      armPlayGate(it);
+      trackAudioPlay(it);
+
       statusEl.textContent = "";
       activeId = it.id;
       fpTitle.textContent = it.title;
-      pendingPlayCountId = it.id;
-
       render();
 
-      const url = urlFor(it);
+      const url = it.url;
       const mime = guessMime(url);
-
-      plyr.source = {
-        type: "audio",
-        title: it.title,
-        sources: [{ src: url, type: mime }]
-      };
-
       const currentSpeed = SPEEDS[speedIndex] || 1;
 
-      const tryPlay = () => {
+      try{
         plyr.speed = currentSpeed;
+        setMediaSource(url, mime);
         const p = plyr.play();
         if (p && typeof p.catch === "function"){
           p.catch(() => {
-            statusEl.textContent = "Oynatma başlatılamadı. Player’daki ▶︎ tuşuna bas.";
+            statusEl.textContent = "Oynatma engellendi. Player içindeki ▶︎ tuşuna bas.";
           });
         }
-      };
-
-      const onCanPlay = () => {
-        playerEl.removeEventListener("canplay", onCanPlay);
-        setTimeout(tryPlay, 50);
-      };
-
-      playerEl.addEventListener("canplay", onCanPlay);
-      setTimeout(() => { if (playerEl.paused) tryPlay(); }, 600);
+        setTimeout(() => {
+          if (playerEl && playerEl.paused) {
+            statusEl.textContent = statusEl.textContent || "Oynatma başlamadı. Player içindeki ▶︎ tuşuna bas.";
+          }
+        }, 900);
+      }catch{
+        statusEl.textContent = "Player başlatılamadı.";
+      }
     }
 
     function playPrev(){
@@ -1576,33 +1657,69 @@
       }
     });
 
-    // =========================
-    // Filters + Search debounce
-    // =========================
     filterFavBtn.addEventListener("click", () => { filterFav = !filterFav; render(); });
-    filterSelBtn.addEventListener("click", () => { filterSel = !filterSel; render(); });
+    if (filterSelBtn) filterSelBtn.addEventListener("click", () => { filterSel = !filterSel; render(); });
 
     resetBtn.addEventListener("click", () => {
       filterFav = false;
       filterSel = false;
       searchEl.value = "";
 
-      sortMode = "title";
+      sortMode = "date";
+      dateSortDir = "desc";
       localStorage.setItem(LS.sortMode, sortMode);
+      localStorage.setItem(LS.sortDirDate, dateSortDir);
 
       setSortIcons();
       render();
     });
 
+    const SEARCH_DEBOUNCE_MS = 900;
+
     let searchTimer = null;
+    let lastSentTermNorm = "";
+
+    function sendSearchEvent(termRawInput) {
+      const termRaw = (termRawInput || "").trim();
+      const termNorm = foldTR(termRaw);
+      const visibleCount = getVisibleItems().length;
+
+      if (termRaw.length === 0) {
+        if (lastSentTermNorm !== "") {
+          lastSentTermNorm = "";
+          gaEvent("search", { search_term: "", results_count: visibleCount });
+        }
+        return;
+      }
+
+      if (termNorm.length < 2) return;
+      if (termNorm === lastSentTermNorm) return;
+
+      lastSentTermNorm = termNorm;
+
+      const params = { search_term: termNorm, results_count: visibleCount };
+      if (__isDebug) params.search_term_raw = termRaw;
+
+      gaEvent("search", params);
+    }
+
+    function renderAndTrackSearch() {
+      render();
+      sendSearchEvent(searchEl.value);
+    }
+
     searchEl.addEventListener("input", () => {
       clearTimeout(searchTimer);
-      searchTimer = setTimeout(() => render(), 90);
+      searchTimer = setTimeout(renderAndTrackSearch, SEARCH_DEBOUNCE_MS);
     });
 
-    // =========================
-    // DRAGGABLE PLAYER (tüm player) + clamp (zoom uyumlu)
-    // =========================
+    searchEl.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter") return;
+      e.preventDefault();
+      clearTimeout(searchTimer);
+      renderAndTrackSearch();
+    });
+
     function restorePlayerPos(){
       try{
         const s = JSON.parse(localStorage.getItem(LS.pos) || "null");
@@ -1627,18 +1744,23 @@
       return { vw, vh };
     }
 
+    function toLayoutPx(v){
+      return useTransformScale ? (v / uiScale) : v;
+    }
+
     function clampPlayerToViewport(){
       const { vw, vh } = getViewportWH();
 
-      const w0 = fp.offsetWidth;
-      const h0 = fp.offsetHeight;
-      const w = useTransformScale ? (w0 * uiScale) : w0;
-      const h = useTransformScale ? (h0 * uiScale) : h0;
+      const vwL = toLayoutPx(vw);
+      const vhL = toLayoutPx(vh);
+
+      const wL = fp.offsetWidth;
+      const hL = fp.offsetHeight;
 
       const minX = 8;
       const minY = 8;
-      const maxX = Math.max(minX, vw - w - 8);
-      const maxY = Math.max(minY, vh - h - 8);
+      const maxX = Math.max(minX, vwL - wL - 8);
+      const maxY = Math.max(minY, vhL - hL - 8);
 
       const left = parseFloat(fp.style.left);
       const top  = parseFloat(fp.style.top);
@@ -1665,9 +1787,21 @@
     }
 
     let dragging = false;
-    let startX = 0, startY = 0, startLeft = 0, startTop = 0;
+    let startClientX = 0, startClientY = 0;
+    let startLeft = 0, startTop = 0;
     let moved = false;
     let suppressClickUntil = 0;
+
+    function getCurrentLeftTopLayout(){
+      const left = parseFloat(fp.style.left);
+      const top  = parseFloat(fp.style.top);
+      if (Number.isFinite(left) && Number.isFinite(top)) return { left, top };
+
+      const rect = fp.getBoundingClientRect();
+      const l = useTransformScale ? (rect.left / uiScale) : rect.left;
+      const t = useTransformScale ? (rect.top  / uiScale) : rect.top;
+      return { left: l, top: t };
+    }
 
     fp.addEventListener("pointerdown", (e) => {
       if (!shouldStartDrag(e.target)) return;
@@ -1678,42 +1812,47 @@
       fp.setPointerCapture(e.pointerId);
       fpHeader.style.cursor = "grabbing";
 
-      const rect = fp.getBoundingClientRect();
-      startX = e.clientX;
-      startY = e.clientY;
-      startLeft = rect.left;
-      startTop = rect.top;
+      startClientX = e.clientX;
+      startClientY = e.clientY;
+
+      const cur = getCurrentLeftTopLayout();
+      startLeft = cur.left;
+      startTop  = cur.top;
 
       fp.style.left = startLeft + "px";
-      fp.style.top = startTop + "px";
+      fp.style.top  = startTop + "px";
       fp.style.bottom = "auto";
-      fp.style.right = "auto";
+      fp.style.right  = "auto";
     });
 
     fp.addEventListener("pointermove", (e) => {
       if (!dragging) return;
 
-      const dx = e.clientX - startX;
-      const dy = e.clientY - startY;
-      if (!moved && (Math.abs(dx) + Math.abs(dy) > 6)) moved = true;
+      const dxClient = e.clientX - startClientX;
+      const dyClient = e.clientY - startClientY;
 
-      const w0 = fp.offsetWidth;
-      const h0 = fp.offsetHeight;
-      const w = useTransformScale ? (w0 * uiScale) : w0;
-      const h = useTransformScale ? (h0 * uiScale) : h0;
+      const dx = useTransformScale ? (dxClient / uiScale) : dxClient;
+      const dy = useTransformScale ? (dyClient / uiScale) : dyClient;
+
+      if (!moved && (Math.abs(dxClient) + Math.abs(dyClient) > 6)) moved = true;
 
       const { vw, vh } = getViewportWH();
+      const vwL = toLayoutPx(vw);
+      const vhL = toLayoutPx(vh);
+
+      const wL = fp.offsetWidth;
+      const hL = fp.offsetHeight;
 
       const minX = 8;
       const minY = 8;
-      const maxX = Math.max(minX, vw - w - 8);
-      const maxY = Math.max(minY, vh - h - 8);
+      const maxX = Math.max(minX, vwL - wL - 8);
+      const maxY = Math.max(minY, vhL - hL - 8);
 
       const nx = Math.min(maxX, Math.max(minX, startLeft + dx));
-      const ny = Math.min(maxY, Math.max(minY, startTop + dy));
+      const ny = Math.min(maxY, Math.max(minY, startTop  + dy));
 
       fp.style.left = nx + "px";
-      fp.style.top = ny + "px";
+      fp.style.top  = ny + "px";
       savePlayerPos(nx, ny);
     });
 
@@ -1747,7 +1886,23 @@
       window.visualViewport.addEventListener("resize", () => clampPlayerToViewport());
     }
 
-    // ✅ NAV ACTIVE
+    (function disablePullToRefresh(){
+      let startY = 0;
+      scrollArea.addEventListener("touchstart", (e) => {
+        if (!e.touches || !e.touches.length) return;
+        startY = e.touches[0].clientY;
+      }, { passive: true });
+
+      scrollArea.addEventListener("touchmove", (e) => {
+        if (!e.touches || !e.touches.length) return;
+        const y = e.touches[0].clientY;
+
+        if (scrollArea.scrollTop <= 0 && y > startY + 4){
+          e.preventDefault();
+        }
+      }, { passive: false });
+    })();
+
     (function setActiveNav(){
       const here = location.href.replace(/\/$/, "");
       document.querySelectorAll(".navRow .navLink").forEach(a => {
@@ -1758,7 +1913,6 @@
       });
     })();
 
-    // INIT
     setSortIcons();
     restorePlayerPos();
     restoreSpeed();
