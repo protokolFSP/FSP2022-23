@@ -196,6 +196,73 @@
       line-height: 1.05;
     }
 
+    /* ✅ Top cards */
+    .tops{
+      display:flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 0 0 12px 0;
+    }
+    .topCard{
+      flex: 1 1 360px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: 0 10px 22px rgba(0,0,0,.05);
+      overflow: hidden;
+    }
+    .topHead{
+      padding: 10px 12px;
+      font-weight: 700;
+      color: #0b5fff;
+      background: #f6f9ff;
+      border-bottom: 1px solid var(--border);
+      line-height: 1.05;
+    }
+    .topList{
+      padding: 6px;
+    }
+    .topItem{
+      width: 100%;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: 12px;
+      border: 1px solid transparent;
+      background: white;
+      cursor: pointer;
+      text-align:left;
+      line-height: 1.05;
+    }
+    .topItem:hover{
+      background: var(--hover);
+      border-color: #e6e6e6;
+    }
+    .topTitle{
+      flex: 1 1 auto;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: .98rem;
+      font-weight: 520;
+    }
+    .topCount{
+      flex: 0 0 auto;
+      font-variant-numeric: tabular-nums;
+      color: var(--muted);
+      font-size: .92rem;
+      white-space: nowrap;
+    }
+    .topEmpty{
+      padding: 10px 12px;
+      color: var(--muted);
+      font-size: .95rem;
+      line-height: 1.05;
+    }
+
     /* Grid: Kayıt | Süre | ⭐ | ✓ | ⬇︎ */
     .headerRow, .itemRow{
       display: grid;
@@ -580,6 +647,18 @@
 
       <div id="meta">Görünən: 0 / Toplam: 0</div>
 
+      <!-- ✅ En çok dinlenen / indirilen -->
+      <div id="tops" class="tops" aria-label="İstatistikler">
+        <div class="topCard">
+          <div class="topHead">En çok dinlenen</div>
+          <div id="topPlayed" class="topList"></div>
+        </div>
+        <div class="topCard">
+          <div class="topHead">En çok indirilen</div>
+          <div id="topDownloaded" class="topList"></div>
+        </div>
+      </div>
+
       <div class="headerRow">
         <div class="colTitle">
           <div class="titleHead">
@@ -672,6 +751,9 @@
     const metaEl   = document.getElementById("meta");
     const statusEl = document.getElementById("status");
 
+    const topPlayedEl = document.getElementById("topPlayed");
+    const topDownloadedEl = document.getElementById("topDownloaded");
+
     const appScaleEl = document.getElementById("appScale");
     const zoomOutBtn = document.getElementById("zoomOutBtn");
     const zoomInBtn  = document.getElementById("zoomInBtn");
@@ -716,7 +798,11 @@
       cacheItems: `fsp.cache.items.${ARCHIVE_ID}.v1`,
       cacheFp:    `fsp.cache.fp.${ARCHIVE_ID}.v1`,
       speed: "fsp.speed.v1",
-      zoom:  "fsp.ui.zoom.v1"
+      zoom:  "fsp.ui.zoom.v1",
+
+      // ✅ istatistikler (sayfaya özel)
+      plays: `fsp.stats.plays.${ARCHIVE_ID}.v1`,
+      downs: `fsp.stats.downs.${ARCHIVE_ID}.v1`
     };
 
     const loadMap = (k) => { try { return JSON.parse(localStorage.getItem(k) || "{}"); } catch { return {}; } };
@@ -725,6 +811,9 @@
     let favs  = loadMap(LS.favs);
     let sels  = loadMap(LS.sels);
     let durs  = loadMap(LS.durs);
+
+    let plays = loadMap(LS.plays);
+    let downs = loadMap(LS.downs);
 
     let filterFav  = false;
     let filterSel  = false;
@@ -1003,6 +1092,84 @@
     });
 
     // =========================
+    // ✅ TOP STATS (plays / downloads)
+    // =========================
+    function bump(map, id){
+      if (!id) return;
+      const v = Number(map[id] || 0);
+      map[id] = Number.isFinite(v) ? (v + 1) : 1;
+    }
+
+    function getTop(map, limit){
+      const byId = new Map(items.map(it => [it.id, it]));
+      return Object.keys(map)
+        .map(id => ({ id, n: Number(map[id] || 0) }))
+        .filter(x => x.n > 0 && byId.has(x.id))
+        .sort((a,b) => b.n - a.n)
+        .slice(0, limit);
+    }
+
+    function renderTop(){
+      const topP = getTop(plays, 8);
+      const topD = getTop(downs, 8);
+
+      topPlayedEl.innerHTML = "";
+      topDownloadedEl.innerHTML = "";
+
+      if (!topP.length){
+        topPlayedEl.innerHTML = `<div class="topEmpty">Henüz dinlenme yok.</div>`;
+      } else {
+        for (const x of topP){
+          const it = items.find(z => z.id === x.id);
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "topItem";
+          btn.innerHTML = `<span class="topTitle">${escHtml(it?.title || "")}</span><span class="topCount">${x.n}</span>`;
+          btn.addEventListener("click", () => playById(x.id));
+          topPlayedEl.appendChild(btn);
+        }
+      }
+
+      if (!topD.length){
+        topDownloadedEl.innerHTML = `<div class="topEmpty">Henüz indirme yok.</div>`;
+      } else {
+        for (const x of topD){
+          const it = items.find(z => z.id === x.id);
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "topItem";
+          btn.innerHTML = `<span class="topTitle">${escHtml(it?.title || "")}</span><span class="topCount">${x.n}</span>`;
+          btn.addEventListener("click", () => downloadById(x.id));
+          topDownloadedEl.appendChild(btn);
+        }
+      }
+    }
+
+    function downloadById(id){
+      const it = items.find(x => x.id === id);
+      if (!it) return;
+
+      bump(downs, id);
+      saveMap(LS.downs, downs);
+      renderTop();
+
+      const fileUrl = urlFor(it);
+      const dlUrl = DL_PROXY + "?u=" + encodeURIComponent(fileUrl);
+      window.location.href = dlUrl;
+    }
+
+    // “gerçek dinlenme”yi playing ile say
+    let pendingPlayStatId = null;
+    playerEl.addEventListener("playing", () => {
+      if (pendingPlayStatId && pendingPlayStatId === activeId){
+        bump(plays, pendingPlayStatId);
+        saveMap(LS.plays, plays);
+        pendingPlayStatId = null;
+        renderTop();
+      }
+    });
+
+    // =========================
     // Duration loader
     // =========================
     const durQueue = [];
@@ -1212,6 +1379,9 @@
 
       listEl.innerHTML = "";
 
+      // ✅ üst istatistikler
+      renderTop();
+
       const toMeasure = (sortMode === "dur") ? items : visible;
       for (const it of toMeasure){
         if (!(durs[it.id] > 0)) requestDuration(it);
@@ -1249,6 +1419,11 @@
 
         dlBtn.addEventListener("click", (e) => {
           e.stopPropagation();
+
+          bump(downs, it.id);
+          saveMap(LS.downs, downs);
+          renderTop();
+
           const fileUrl = urlFor(it);
           const dlUrl = DL_PROXY + "?u=" + encodeURIComponent(fileUrl);
           window.location.href = dlUrl;
@@ -1315,6 +1490,10 @@
       statusEl.textContent = "";
       activeId = it.id;
       fpTitle.textContent = it.title;
+
+      // ✅ dinlenme sayımı için sıraya al (playing olunca +1)
+      pendingPlayStatId = it.id;
+
       render();
 
       const url = urlFor(it);
