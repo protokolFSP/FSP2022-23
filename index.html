@@ -726,6 +726,10 @@
     const DL_PROXY = "https://fspdownload.protokolfsp.workers.dev/";
     const COUNTER_API = "https://fspdlcounter.protokolfsp.workers.dev";
 
+    // 2021–23 sabit liste optimizasyonu
+    const FORCE_REFRESH = new URLSearchParams(location.search).has("refresh"); // ?refresh=1
+    const LIST_NEVER_CHANGES = true;
+
     const IS_SAFARI = (() => {
       const ua = navigator.userAgent || "";
       const isApple = /Mac|iPhone|iPad|iPod/i.test(ua);
@@ -937,11 +941,19 @@
       sortDirPlay: "fsp1.sort.play.dir.v1",
       sortDirDl:   "fsp1.sort.dl.dir.v1",
       speed: "fsp1.speed.v1",
-      zoom:  "fsp1.ui.zoom.v1"
+      zoom:  "fsp1.ui.zoom.v1",
+
+      // 2021–23 için sabit liste cache
+      itemsCache: "fsp1.items.cache.FSP21_23.v1",
+      itemsCacheAt: "fsp1.items.cacheAt.FSP21_23.v1"
     };
 
     const loadMap = (k) => { try { return JSON.parse(localStorage.getItem(k) || "{}"); } catch { return {}; } };
     const saveMap = (k, v) => localStorage.setItem(k, JSON.stringify(v));
+
+    function loadAny(k){
+      try { return JSON.parse(localStorage.getItem(k) || "null"); } catch { return null; }
+    }
 
     let favs  = loadMap(LS.favs);
     let sels  = loadMap(LS.sels);
@@ -1363,11 +1375,24 @@
     }
 
     async function loadItems(){
-      statusEl.textContent = "Yükleniyor...";
+      const cached = loadAny(LS.itemsCache);
+      const hasCache = Array.isArray(cached) && cached.length > 0;
+
+      // 2021–23 sabit: cache varsa network'e çıkma (refresh=1 hariç)
+      if (LIST_NEVER_CHANGES && hasCache && !FORCE_REFRESH){
+        items = cached;
+        statusEl.textContent = "";
+        setSortIcons();
+        render();
+        scheduleRefreshCounts(60);
+        return;
+      }
+
+      statusEl.textContent = hasCache ? "" : "Yükleniyor...";
 
       try{
-        const metaUrl = `https://archive.org/metadata/${encodeURIComponent(IA_IDENTIFIER_1)}?v=${Date.now()}`;
-        const res = await fetch(metaUrl, { cache: "no-store" });
+        const metaUrl = `https://archive.org/metadata/${encodeURIComponent(IA_IDENTIFIER_1)}${FORCE_REFRESH ? ("?v=" + Date.now()) : ""}`;
+        const res = await fetch(metaUrl, { cache: FORCE_REFRESH ? "no-store" : "no-cache" });
         if (!res.ok) throw new Error("IA metadata okunamadı");
         const j = await res.json();
 
@@ -1389,12 +1414,27 @@
           });
 
         items = list;
+
+        // cache yaz
+        localStorage.setItem(LS.itemsCacheAt, String(Date.now()));
+        localStorage.setItem(LS.itemsCache, JSON.stringify(items));
+
         statusEl.textContent = items.length ? "" : "Kayıt bulunamadı.";
         setSortIcons();
         render();
         scheduleRefreshCounts(100);
       }catch(err){
         console.error(err);
+
+        if (hasCache){
+          items = cached;
+          statusEl.textContent = "";
+          setSortIcons();
+          render();
+          scheduleRefreshCounts(200);
+          return;
+        }
+
         statusEl.textContent = "Liste yüklenemedi.";
       }
     }
