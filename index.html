@@ -29,6 +29,8 @@
 
   <style>
     :root{
+      --capLines: 6;
+
       --border:#e9e9e9;
       --muted:#6b6b6b;
       --bg:#ffffff;
@@ -430,7 +432,7 @@
         4px 14px 30px rgba(0,0,0,.10),
         0px 2px 6px rgba(0,0,0,.06);
 
-      overflow: hidden;
+      overflow: visible;
       z-index: 9999;
 
       -webkit-transform: translateZ(0);
@@ -445,6 +447,84 @@
       opacity: 0;
       pointer-events: none;
     }
+
+    /* Captions dock */
+    #captionsDock{
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 100%;
+      transform: translateY(12px);
+      pointer-events: none;
+      z-index: 10000;
+    }
+    #captions{
+      pointer-events: auto;
+      margin: 0;
+      padding: 10px 12px;
+      padding-bottom: calc(10px + .55em);
+      border-radius: 12px;
+      border: 2px solid #d3d3d3;
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+      background: #fafafa;
+      white-space: pre-wrap;
+      line-height: 1.25;
+      font-size: 1.02rem;
+      overflow: hidden;
+      max-height: calc(1.25em * var(--capLines) + 34px);
+      box-shadow: 0 10px 22px rgba(0,0,0,.06);
+      cursor: pointer;
+    }
+    #captions.isEmpty{ color: var(--muted); cursor: default; }
+    #captions.hidden{ display:none; }
+
+    /* cc / CC / CCx buttons */
+    .miniBtn.on{
+      border-color: var(--blue);
+      background: rgba(43,124,255,.10);
+      box-shadow: 0 0 0 3px rgba(43,124,255,.12) inset;
+    }
+    .ccModeBtn{
+      width: auto;
+      min-width: 42px;
+      padding: 0 10px;
+      border-color: var(--blue);
+      border-radius: 12px;
+    }
+    .ccModeBtn .btnMark{
+      font-weight: 850;
+      font-size: 16px;
+      letter-spacing: .3px;
+      line-height: 1;
+    }
+    .ccModeBtn.on .btnMark{ color: var(--orange); }
+    .ccModeBtn:not(.on) .btnMark{ color: #404040; }
+
+    /* TXT toggle button in player header */
+    #fpTxtBtn{
+      width: auto;
+      min-width: 56px;
+      padding: 0 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(245,158,11,.55);
+      background: rgba(245,158,11,.10);
+      box-shadow: 0 0 0 3px rgba(245,158,11,.10) inset;
+    }
+    #fpTxtBtn .btnMark{
+      font-weight: 900;
+      letter-spacing: .5px;
+      font-size: 16px;
+      color: #b45309;
+      line-height: 1;
+    }
+    #fpTxtBtn:hover{ background: rgba(245,158,11,.16); }
+    #fpTxtBtn.on{
+      border-color: rgba(43,124,255,.70);
+      background: rgba(43,124,255,.12);
+      box-shadow: var(--blueGlow);
+    }
+    #fpTxtBtn.on .btnMark{ color: #0b5fff; }
 
     #fpHeader{
       display:flex;
@@ -495,6 +575,8 @@
       align-items:center;
       gap: 8px;
       flex: 0 0 auto;
+      flex-wrap: wrap;
+      justify-content: flex-end;
     }
 
     .miniBtn{
@@ -507,6 +589,7 @@
       display:flex;
       align-items:center;
       justify-content:center;
+      -webkit-tap-highlight-color: transparent;
     }
     .miniBtn:hover{ background: var(--hover); }
     .miniBtn svg{ width:16px; height:16px; }
@@ -595,6 +678,237 @@
       color: #c2410c;
       font-weight: 650;
     }
+
+    /* Transcript popup */
+    #txPanel{
+      position: fixed;
+      z-index: 10050;
+      top: max(14px, env(safe-area-inset-top));
+      right: max(14px, env(safe-area-inset-right));
+      width: min(960px, calc(100vw - 28px));
+      height: min(82vh, 860px);
+      background: #fff;
+      border: 1.5px solid #d6d6d6;
+      border-right-color: #bdbdbd;
+      border-bottom-color:#b3b3b3;
+      border-radius: 18px;
+      box-shadow:
+        10px 34px 86px rgba(0,0,0,.20),
+        4px 14px 30px rgba(0,0,0,.10),
+        0px 2px 6px rgba(0,0,0,.06);
+      overflow: hidden;
+      display: none;
+      flex-direction: column;
+      touch-action: none;
+      transform-origin: top right;
+      will-change: transform;
+    }
+    #txPanel.open{ display: flex; }
+
+    #txHeader{
+      padding: 10px 12px;
+      background: #fbfbfb;
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+      cursor: grab;
+      user-select:none;
+      touch-action: none;
+      -webkit-tap-highlight-color: transparent;
+      border-bottom: 1px solid #ececec;
+      line-height: 1.05;
+    }
+
+    #txTitle{
+      font-weight: 650;
+      font-size: .98rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    #txBtns{
+      display:flex;
+      gap: 8px;
+      flex: 0 0 auto;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .txBtn{
+      height: 36px;
+      padding: 0 12px;
+      border-radius: 12px;
+      border: 1px solid #d8d8d8;
+      background: white;
+      cursor: pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap: 8px;
+      font-weight: 650;
+      font-size: .92rem;
+      user-select:none;
+      line-height: 1;
+      white-space: nowrap;
+    }
+    .txBtn:hover{ background: var(--hover); }
+    .txBtn:disabled{ opacity: .45; cursor: default; }
+    .txBtn svg{ width: 16px; height: 16px; }
+
+    #txBody{
+      padding: 10px 12px 12px 12px;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      flex: 1 1 auto;
+      background: #fff;
+    }
+
+    #txInfo{
+      color: var(--muted);
+      font-size: .92rem;
+      margin: 0 0 8px 0;
+      line-height: 1.05;
+    }
+
+    #txSearchRow{
+      display: none;
+      gap: 8px;
+      align-items: center;
+      margin: 0 0 10px 0;
+      padding: 8px;
+      border: 1px solid #e2e2e2;
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: inset 0 1px 0 rgba(0,0,0,.03);
+      position: sticky;
+      top: 0;
+      z-index: 3;
+    }
+    #txSearchRow.on{ display: flex; }
+
+    #txSearchInput{
+      flex: 1 1 auto;
+      min-width: 140px;
+      height: 46px;
+      padding: 0 14px;
+      border: 1px solid #d8d8d8;
+      border-radius: 14px;
+      font-size: 1.05rem;
+      outline: none;
+    }
+
+    .txNavBtn{
+      width: 60px;
+      height: 46px;
+      border-radius: 14px;
+      border: 1px solid #d8d8d8;
+      background: white;
+      cursor: pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      user-select:none;
+      font-weight: 900;
+      font-size: 32px;
+      line-height: 1;
+    }
+    .txNavBtn:hover{ background: var(--hover); }
+    .txNavBtn:disabled{ opacity: .45; cursor: default; }
+
+    #txMatchCount{
+      min-width: 98px;
+      text-align: right;
+      color: #404040;
+      font-variant-numeric: tabular-nums;
+      font-size: .92rem;
+      user-select:none;
+    }
+
+    #txContent{
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.35;
+      font-size: .92rem;
+      margin: 0;
+    }
+
+    .txMark{
+      background: rgba(43,124,255,.22);
+      border-radius: 6px;
+      padding: 0 2px;
+    }
+    .txMark.active{
+      background: rgba(245,158,11,.35);
+      box-shadow: 0 0 0 2px rgba(245,158,11,.20);
+    }
+
+    @media (max-width: 680px){
+      #txHeader{ flex-wrap: wrap; gap: 8px; }
+      #txTitle{
+        flex: 1 1 100%;
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+      }
+      #txBtns{ width: 100%; justify-content: flex-end; }
+      .txBtn{ height: 34px; padding: 0 10px; font-size: .9rem; }
+      #txSearchInput{ font-size: 16px; }
+    }
+
+    #txResizeHandle{
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 54px;
+      height: 54px;
+      cursor: nwse-resize;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: none;
+      background: linear-gradient(135deg, rgba(43,124,255,.0), rgba(43,124,255,.18));
+      border-top: 1px solid #e2e2e2;
+      border-right: 1px solid #e2e2e2;
+      border-top-right-radius: 18px;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.90),
+        0 6px 16px rgba(0,0,0,.10);
+    }
+    #txResizeHandle:hover{
+      background: linear-gradient(135deg, rgba(43,124,255,.06), rgba(43,124,255,.24));
+    }
+    #txResizeHandle svg{ width: 22px; height: 22px; opacity: .88; }
+
+    /* Small link below list (optional) */
+    #txCacheRow{
+      margin: 10px 2px 0 2px;
+      color: var(--muted);
+      font-size: .92rem;
+      line-height: 1.15;
+      display:flex;
+      gap: 12px;
+      align-items:center;
+      flex-wrap: wrap;
+    }
+    #txCacheClearBtn{
+      height: 34px;
+      padding: 0 12px;
+      border-radius: 12px;
+      border: 1px solid #d8d8d8;
+      background: white;
+      cursor: pointer;
+      font-weight: 650;
+      font-size: .92rem;
+      user-select:none;
+    }
+    #txCacheClearBtn:hover{ background: var(--hover); }
   </style>
 </head>
 
@@ -689,13 +1003,37 @@
 
       <div id="list"></div>
       <div id="status"></div>
+
+      <div id="txCacheRow" aria-label="Transkript cache">
+        <button id="txCacheClearBtn" type="button" title="TXT cache temizle">TXT Cache Temizle</button>
+        <span id="txCacheMsg" aria-live="polite"></span>
+      </div>
     </div>
   </div>
 
   <div id="floatingPlayer" role="region" aria-label="Oynatıcı">
+    <div id="captionsDock" aria-label="Altyazılar">
+      <div id="captions" class="isEmpty" aria-live="polite">Bir kayıt seç...</div>
+    </div>
+
     <div id="fpHeader" title="Sürükle">
       <div id="fpTitle">Bir kayıt seç...</div>
       <div id="fpHeaderRight">
+
+        <button id="ccSmallBtn" class="miniBtn ccModeBtn" type="button" title="Altyazı (cc)" aria-pressed="false" aria-label="Altyazı (cc)">
+          <span class="btnMark">cc</span>
+        </button>
+        <button id="ccMedBtn" class="miniBtn ccModeBtn" type="button" title="Altyazı (CC)" aria-pressed="false" aria-label="Altyazı (CC)">
+          <span class="btnMark">CC</span>
+        </button>
+        <button id="ccXBtn" class="miniBtn ccModeBtn" type="button" title="Altyazı (CCx)" aria-pressed="false" aria-label="Altyazı (CCx)">
+          <span class="btnMark">CCx</span>
+        </button>
+
+        <button id="fpTxtBtn" class="miniBtn" type="button" title="Transkript (TXT)" aria-label="Transkript (TXT)" aria-pressed="false">
+          <span class="btnMark">TXT</span>
+        </button>
+
         <div id="speedWrap" class="speedWrap" aria-label="Hız">
           <button id="slowBtn" class="speedCtlBtn" type="button" title="Yavaşlat (🐢)">🐢</button>
           <div id="speedValue" class="speedValue on" title="Oynatma hızı">1×</div>
@@ -719,16 +1057,86 @@
     </div>
   </div>
 
+  <!-- Transcript popup -->
+  <div id="txPanel" role="dialog" aria-label="Transkript" aria-hidden="true">
+    <div id="txHeader">
+      <div id="txTitle">Transkript</div>
+      <div id="txBtns">
+        <button id="txCopyBtn" class="txBtn" type="button" title="Kopieren">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M9 9h10v10H9z"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+          </svg>
+          Kopieren
+        </button>
+        <button id="txDownloadBtn" class="txBtn" type="button" title="Download">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/>
+          </svg>
+          Download
+        </button>
+        <button id="txSearchBtn" class="txBtn" type="button" title="Suchen">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="11" cy="11" r="6"></circle>
+            <path d="M20 20l-3.5-3.5"></path>
+          </svg>
+          Suchen
+        </button>
+        <button id="txCloseBtn" class="txBtn" type="button" title="Schließen">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M18 6L6 18"/><path d="M6 6l12 12"/>
+          </svg>
+          Schließen
+        </button>
+      </div>
+    </div>
+
+    <div id="txBody">
+      <div id="txInfo">—</div>
+
+      <div id="txSearchRow" aria-label="Suchen">
+        <input id="txSearchInput" type="text" placeholder="Suchen…" />
+        <button id="txPrevMatchBtn" class="txNavBtn" type="button" title="Vorheriger Treffer">‹</button>
+        <button id="txNextMatchBtn" class="txNavBtn" type="button" title="Nächster Treffer">›</button>
+        <div id="txMatchCount" title="Treffer">0/0</div>
+      </div>
+
+      <pre id="txContent"></pre>
+    </div>
+
+    <div id="txResizeHandle" title="Resize" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M7 17l10-10"/><path d="M11 17h6v-6"/>
+      </svg>
+    </div>
+  </div>
+
   <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
 
   <script>
+    // =========================
+    // Sabitler / Parametreler
+    // =========================
     const IA_IDENTIFIER_1 = "FSP21_23";
+    const TX_FOLDER = "FSP21_23"; // FSPtranskript/transcripts/<FOLDER>/
     const DL_PROXY = "https://fspdownload.protokolfsp.workers.dev/";
     const COUNTER_API = "https://fspdlcounter.protokolfsp.workers.dev";
+
+    // TXT/SRT base'leri (sırayla dene)
+    const TRANSCRIPT_BASES = [
+      "https://protokolfsp.github.io/FSPtranskript/transcripts/",
+      "https://raw.githubusercontent.com/protokolFSP/FSPtranskript/main/transcripts/",
+      "https://cdn.jsdelivr.net/gh/protokolFSP/FSPtranskript@main/transcripts/"
+    ];
 
     // 2021–23 sabit liste optimizasyonu
     const FORCE_REFRESH = new URLSearchParams(location.search).has("refresh"); // ?refresh=1
     const LIST_NEVER_CHANGES = true;
+
+    // Captions
+    const CAPTION_MAX_LINES = 6;
+    const CAPTION_TARGET_LINES = 3;
+    const CAPTION_MAX_LINES_9 = 9;
+    const CAPTION_MAX_LINES_13 = 13;
 
     const IS_SAFARI = (() => {
       const ua = navigator.userAgent || "";
@@ -761,7 +1169,7 @@
     const speedValueEl = document.getElementById("speedValue");
 
     const filterFavBtn  = document.getElementById("filterFav");
-    const filterSelBtn  = document.getElementById("filterSel"); // (DOM'da yok; günceldeki gibi böyle kalır)
+    const filterSelBtn  = document.getElementById("filterSel"); // (DOM'da yok; böyle kalır)
     const resetBtn      = document.getElementById("resetBtn");
 
     const sortDurBtn  = document.getElementById("sortDurBtn");
@@ -774,11 +1182,44 @@
     const sortDlCountBtn  = document.getElementById("sortDlCountBtn");
     const sortDlCountIcon = document.getElementById("sortDlCountIcon");
 
+    // Captions UI nodes
+    const ccSmallBtn = document.getElementById("ccSmallBtn");
+    const ccMedBtn   = document.getElementById("ccMedBtn");
+    const ccXBtn     = document.getElementById("ccXBtn");
+    const captionsEl = document.getElementById("captions");
+
+    // TXT UI nodes
+    const fpTxtBtn = document.getElementById("fpTxtBtn");
+    const txPanel = document.getElementById("txPanel");
+    const txHeader = document.getElementById("txHeader");
+    const txResizeHandle = document.getElementById("txResizeHandle");
+    const txTitleEl = document.getElementById("txTitle");
+    const txInfoEl = document.getElementById("txInfo");
+    const txContentEl = document.getElementById("txContent");
+    const txBodyEl = document.getElementById("txBody");
+
+    const txCopyBtn = document.getElementById("txCopyBtn");
+    const txDownloadBtn = document.getElementById("txDownloadBtn");
+    const txSearchBtn = document.getElementById("txSearchBtn");
+    const txCloseBtn = document.getElementById("txCloseBtn");
+
+    const txSearchRow = document.getElementById("txSearchRow");
+    const txSearchInput = document.getElementById("txSearchInput");
+    const txPrevMatchBtn = document.getElementById("txPrevMatchBtn");
+    const txNextMatchBtn = document.getElementById("txNextMatchBtn");
+    const txMatchCountEl = document.getElementById("txMatchCount");
+
+    const txCacheClearBtn = document.getElementById("txCacheClearBtn");
+    const txCacheMsg = document.getElementById("txCacheMsg");
+
     const plyr = new Plyr(playerEl, {
       seekTime: 5,
       controls: ["rewind","play","fast-forward","progress","current-time","duration","mute","volume"]
     });
 
+    // =========================
+    // GA helpers (korunur)
+    // =========================
     function gaEvent(name, params = {}) {
       try {
         if (typeof gtag !== "function") return;
@@ -801,7 +1242,26 @@
         src: it.src || "S1"
       });
     }
+    function trackTranscriptOpen(it){
+      gaEvent("transcript_open", {
+        audio_id: it?.id || "",
+        audio_title: it?.title || "",
+        file_name: (it?.name || "").split("/").pop() || "",
+        src: it?.src || "S1"
+      });
+    }
+    function trackTranscriptDownload(it, filename){
+      gaEvent("transcript_download", {
+        audio_id: it?.id || "",
+        audio_title: it?.title || "",
+        file_name: filename || "",
+        src: it?.src || "S1"
+      });
+    }
 
+    // =========================
+    // Counters (korunur)
+    // =========================
     let globalPlayCounts = {};
     let globalDownloadCounts = {};
 
@@ -930,6 +1390,9 @@
       statusEl.textContent = "Audio hata: " + (code || "bilinmiyor");
     });
 
+    // =========================
+    // LocalStorage keys (korunur + ekler)
+    // =========================
     const LS = {
       favs:  "fsp1.favs.v1",
       sels:  "fsp1.sels.v1",
@@ -945,15 +1408,18 @@
 
       // 2021–23 için sabit liste cache
       itemsCache: "fsp1.items.cache.FSP21_23.v1",
-      itemsCacheAt: "fsp1.items.cacheAt.FSP21_23.v1"
+      itemsCacheAt: "fsp1.items.cacheAt.FSP21_23.v1",
+
+      // captions + transcript panel (yeni)
+      captionsMode: "fsp1.captions.mode.v1",
+      txSize: "fsp1.tx.size.v1",
+      txPos:  "fsp1.tx.pos.v1"
     };
 
     const loadMap = (k) => { try { return JSON.parse(localStorage.getItem(k) || "{}"); } catch { return {}; } };
     const saveMap = (k, v) => localStorage.setItem(k, JSON.stringify(v));
-
-    function loadAny(k){
-      try { return JSON.parse(localStorage.getItem(k) || "null"); } catch { return null; }
-    }
+    function loadAny(k){ try { return JSON.parse(localStorage.getItem(k) || "null"); } catch { return null; } }
+    function saveAny(k, v){ localStorage.setItem(k, JSON.stringify(v)); }
 
     let favs  = loadMap(LS.favs);
     let sels  = loadMap(LS.sels);
@@ -965,18 +1431,9 @@
     let items = [];
     let activeId = null;
 
-    let sortMode = localStorage.getItem(LS.sortMode) || "date";
-    let durSortDir  = (localStorage.getItem(LS.sortDirDur) === "desc") ? "desc" : "asc";
-    let dateSortDir = (localStorage.getItem(LS.sortDirDate) === "asc") ? "asc" : "desc";
-    let playSortDir = (localStorage.getItem(LS.sortDirPlay) === "asc") ? "asc" : "desc";
-    let dlSortDir   = (localStorage.getItem(LS.sortDirDl) === "asc") ? "asc" : "desc";
-
-    if (!localStorage.getItem(LS.sortMode)) localStorage.setItem(LS.sortMode, sortMode);
-    if (!localStorage.getItem(LS.sortDirDate)) localStorage.setItem(LS.sortDirDate, dateSortDir);
-
-    if (!localStorage.getItem(LS.sortDirPlay)) localStorage.setItem(LS.sortDirPlay, playSortDir);
-    if (!localStorage.getItem(LS.sortDirDl)) localStorage.setItem(LS.sortDirDl, dlSortDir);
-
+    // =========================
+    // Speed (korunur)
+    // =========================
     const SPEEDS = [0.5, 0.75, 0.9, 1, 1.25, 1.5, 1.75, 2.0, 2.25];
     let speedIndex = SPEEDS.indexOf(1);
 
@@ -1015,10 +1472,23 @@
     slowBtn.addEventListener("click", (e) => { e.stopPropagation(); applySpeedByIndex(speedIndex - 1); });
     fastBtn.addEventListener("click", (e) => { e.stopPropagation(); applySpeedByIndex(speedIndex + 1); });
 
+    // =========================
+    // Zoom (korunur + txPanel scale desteği)
+    // =========================
     const ZOOMS = [0.85, 0.9, 0.95, 1, 1.05, 1.1, 1.15, 1.2];
     let zoomIndex = ZOOMS.indexOf(1);
     let uiScale = 1;
     let useTransformScale = false;
+
+    function getViewportWH(){
+      const vv = window.visualViewport;
+      const vw = (vv && vv.width)  ? vv.width  : window.innerWidth;
+      const vh = (vv && vv.height) ? vv.height : window.innerHeight;
+      return { vw, vh };
+    }
+    function toLayoutPx(v){
+      return useTransformScale ? (v / uiScale) : v;
+    }
 
     function setZoomUI(v){
       const pct = Math.round(v * 100) + "%";
@@ -1032,6 +1502,15 @@
       zoomInBtn.title  = `Büyüt (${pct})`;
       zoomOutBtn.setAttribute("aria-label", `Küçült (${pct})`);
       zoomInBtn.setAttribute("aria-label", `Büyüt (${pct})`);
+    }
+
+    function updateTxOverlayScale(){
+      if (!txPanel) return;
+      if (!useTransformScale){
+        txPanel.style.transform = "";
+        return;
+      }
+      txPanel.style.transform = `scale(${uiScale})`;
     }
 
     function applyZoomByIndex(idx){
@@ -1053,7 +1532,13 @@
 
       localStorage.setItem(LS.zoom, String(v));
       setZoomUI(v);
-      setTimeout(() => clampPlayerToViewport(), 0);
+      updateTxOverlayScale();
+
+      setTimeout(() => {
+        clampPlayerToViewport();
+        clampTxSizeToViewport();
+        clampTxPosToViewport();
+      }, 0);
     }
 
     function restoreZoom(){
@@ -1088,10 +1573,14 @@
     attachDoubleTapReset(zoomOutBtn);
     attachDoubleTapReset(zoomInBtn);
 
+    // typing mode (korunur) + tx search focus hide etmesin diye tx panel ayrı (fp zaten hiddenWhileTyping)
     function setTypingMode(on){ fp.classList.toggle("hiddenWhileTyping", !!on); }
     searchEl.addEventListener("focus", () => setTypingMode(true));
     searchEl.addEventListener("blur",  () => setTypingMode(false));
 
+    // =========================
+    // Utils (korunur)
+    // =========================
     function escHtml(s){
       return (s ?? "").toString()
         .replace(/&/g,"&amp;")
@@ -1175,12 +1664,25 @@
       return t;
     }
 
+    // =========================
+    // Sort (korunur)
+    // =========================
+    let sortMode = localStorage.getItem(LS.sortMode) || "date";
+    let durSortDir  = (localStorage.getItem(LS.sortDirDur) === "desc") ? "desc" : "asc";
+    let dateSortDir = (localStorage.getItem(LS.sortDirDate) === "asc") ? "asc" : "desc";
+    let playSortDir = (localStorage.getItem(LS.sortDirPlay) === "asc") ? "asc" : "desc";
+    let dlSortDir   = (localStorage.getItem(LS.sortDirDl) === "asc") ? "asc" : "desc";
+
+    if (!localStorage.getItem(LS.sortMode)) localStorage.setItem(LS.sortMode, sortMode);
+    if (!localStorage.getItem(LS.sortDirDate)) localStorage.setItem(LS.sortDirDate, dateSortDir);
+    if (!localStorage.getItem(LS.sortDirPlay)) localStorage.setItem(LS.sortDirPlay, playSortDir);
+    if (!localStorage.getItem(LS.sortDirDl)) localStorage.setItem(LS.sortDirDl, dlSortDir);
+
     function setArrowIcon(svgEl, isAsc) {
       if (!svgEl) return;
       while (svgEl.firstChild) svgEl.removeChild(svgEl.firstChild);
 
       const ns = "http://www.w3.org/2000/svg";
-
       const mkPath = (d) => {
         const p = document.createElementNS(ns, "path");
         p.setAttribute("d", d);
@@ -1257,6 +1759,9 @@
       render();
     });
 
+    // =========================
+    // Duration loader (korunur)
+    // =========================
     const durQueue = [];
     const durLoading = new Set();
     let durActive = 0;
@@ -1334,6 +1839,9 @@
       });
     }
 
+    // =========================
+    // Download proxy (korunur)
+    // =========================
     function makeProxyUrl(fileUrl, filename){
       const u = DL_PROXY + "?u=" + encodeURIComponent(fileUrl);
       return filename ? (u + "&f=" + encodeURIComponent(filename)) : u;
@@ -1374,6 +1882,9 @@
       return `https://archive.org/download/${identifier}/${parts.join("/")}`;
     }
 
+    // =========================
+    // List loading (korunur)
+    // =========================
     async function loadItems(){
       const cached = loadAny(LS.itemsCache);
       const hasCache = Array.isArray(cached) && cached.length > 0;
@@ -1439,6 +1950,9 @@
       }
     }
 
+    // =========================
+    // Visible items + render (korunur)
+    // =========================
     function getVisibleItems(){
       const q = foldTR((searchEl.value || "").trim());
 
@@ -1494,6 +2008,35 @@
       }
 
       return arr;
+    }
+
+    function iconButton(kind, on, title){
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "iconBtn" + (on ? " on" : "");
+      btn.title = title;
+      btn.dataset.kind = kind;
+
+      if (kind === "star"){
+        btn.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="${on ? "currentColor" : "none"}" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1L12 2z"/>
+          </svg>`;
+      } else if (kind === "check"){
+        btn.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M20 6L9 17l-5-5"/>
+          </svg>`;
+      } else if (kind === "download"){
+        btn.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M12 3v12"/>
+            <path d="M7 10l5 5 5-5"/>
+            <path d="M5 21h14"/>
+          </svg>`;
+      }
+
+      return btn;
     }
 
     function render(){
@@ -1577,35 +2120,9 @@
       }
     }
 
-    function iconButton(kind, on, title){
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "iconBtn" + (on ? " on" : "");
-      btn.title = title;
-      btn.dataset.kind = kind;
-
-      if (kind === "star"){
-        btn.innerHTML = `
-          <svg viewBox="0 0 24 24" fill="${on ? "currentColor" : "none"}" stroke="currentColor" stroke-width="2" aria-hidden="true">
-            <path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1L12 2z"/>
-          </svg>`;
-      } else if (kind === "check"){
-        btn.innerHTML = `
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-            <path d="M20 6L9 17l-5-5"/>
-          </svg>`;
-      } else if (kind === "download"){
-        btn.innerHTML = `
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-            <path d="M12 3v12"/>
-            <path d="M7 10l5 5 5-5"/>
-            <path d="M5 21h14"/>
-          </svg>`;
-      }
-
-      return btn;
-    }
-
+    // =========================
+    // Player play/next/prev (korunur + captions load)
+    // =========================
     function playById(id){
       const visible = getVisibleItems();
       const idx = visible.findIndex(x => x.id === id);
@@ -1642,6 +2159,15 @@
       try{
         plyr.speed = currentSpeed;
         setMediaSource(url, mime);
+
+        // captions: seçili kayıt değişince (captions açıksa) yeniden yükle
+        if (isCaptionsOn()){
+          renderCaptionInfo("Altyazı yükleniyor…");
+          loadSrtForItem(it).catch(()=>{});
+        } else {
+          renderCaptionInfo("");
+        }
+
         const p = plyr.play();
         if (p && typeof p.catch === "function"){
           p.catch(() => {
@@ -1694,6 +2220,11 @@
       } else if (e.code === "ArrowRight"){
         e.preventDefault();
         playNext();
+      } else if (e.key === "Escape"){
+        if (txOpen){
+          e.preventDefault();
+          closeTranscript();
+        }
       }
     });
 
@@ -1714,8 +2245,8 @@
       render();
     });
 
+    // Search GA (korunur)
     const SEARCH_DEBOUNCE_MS = 900;
-
     let searchTimer = null;
     let lastSentTermNorm = "";
 
@@ -1760,6 +2291,9 @@
       renderAndTrackSearch();
     });
 
+    // =========================
+    // Floating player drag (korunur + captions top clamp iyileştirmesi)
+    // =========================
     function restorePlayerPos(){
       try{
         const s = JSON.parse(localStorage.getItem(LS.pos) || "null");
@@ -1777,17 +2311,6 @@
       localStorage.setItem(LS.pos, JSON.stringify({x,y}));
     }
 
-    function getViewportWH(){
-      const vv = window.visualViewport;
-      const vw = (vv && vv.width)  ? vv.width  : window.innerWidth;
-      const vh = (vv && vv.height) ? vv.height : window.innerHeight;
-      return { vw, vh };
-    }
-
-    function toLayoutPx(v){
-      return useTransformScale ? (v / uiScale) : v;
-    }
-
     function clampPlayerToViewport(){
       const { vw, vh } = getViewportWH();
 
@@ -1797,8 +2320,13 @@
       const wL = fp.offsetWidth;
       const hL = fp.offsetHeight;
 
+      // Captions açıkken üstten taşmayı azalt
+      const capH = (isCaptionsOn() && captionsEl && !captionsEl.classList.contains("hidden"))
+        ? (captionsEl.getBoundingClientRect().height / (useTransformScale ? uiScale : 1))
+        : 0;
+
       const minX = 8;
-      const minY = 8;
+      const minY = 8 + capH;
       const maxX = Math.max(minX, vwL - wL - 8);
       const maxY = Math.max(minY, vhL - hL - 8);
 
@@ -1883,8 +2411,12 @@
       const wL = fp.offsetWidth;
       const hL = fp.offsetHeight;
 
+      const capH = (isCaptionsOn() && captionsEl && !captionsEl.classList.contains("hidden"))
+        ? (captionsEl.getBoundingClientRect().height / (useTransformScale ? uiScale : 1))
+        : 0;
+
       const minX = 8;
-      const minY = 8;
+      const minY = 8 + capH;
       const maxX = Math.max(minX, vwL - wL - 8);
       const maxY = Math.max(minY, vhL - hL - 8);
 
@@ -1920,10 +2452,25 @@
       }
     }, true);
 
-    window.addEventListener("resize", () => clampPlayerToViewport());
-    window.addEventListener("orientationchange", () => setTimeout(clampPlayerToViewport, 150));
+    window.addEventListener("resize", () => {
+      clampPlayerToViewport();
+      clampTxSizeToViewport();
+      clampTxPosToViewport();
+      updateTxOverlayScale();
+    });
+    window.addEventListener("orientationchange", () => setTimeout(() => {
+      clampPlayerToViewport();
+      clampTxSizeToViewport();
+      clampTxPosToViewport();
+      updateTxOverlayScale();
+    }, 150));
     if (window.visualViewport){
-      window.visualViewport.addEventListener("resize", () => clampPlayerToViewport());
+      window.visualViewport.addEventListener("resize", () => {
+        clampPlayerToViewport();
+        clampTxSizeToViewport();
+        clampTxPosToViewport();
+        updateTxOverlayScale();
+      });
     }
 
     (function disablePullToRefresh(){
@@ -1953,12 +2500,1031 @@
       });
     })();
 
+    // =========================
+    // CAPTIONS (SRT) — taşınan modül
+    // =========================
+    const CAPTION_MODES = ["cc", "CC", "CCx"];
+    function readCaptionMode(){
+      const raw = localStorage.getItem(LS.captionsMode) || "";
+      if (CAPTION_MODES.includes(raw)) return raw;
+      return ""; // default off
+    }
+    let captionMode = readCaptionMode();
+    const srtCache = new Map(); // id -> cues
+    let srtCtrl = null;
+    let activeCues = [];
+    let lastCueIdx = -1;
+
+    function isCaptionsOn(){ return !!captionMode; }
+
+    function getCaptionMaxLines(){
+      if (captionMode === "CC") return CAPTION_MAX_LINES_9;
+      if (captionMode === "CCx") return CAPTION_MAX_LINES_13;
+      return CAPTION_MAX_LINES;
+    }
+    function getCaptionTargetLines(){
+      if (captionMode === "CC") return CAPTION_MAX_LINES_9;
+      if (captionMode === "CCx") return CAPTION_MAX_LINES_13;
+      return CAPTION_TARGET_LINES;
+    }
+
+    function setCaptionUi(){
+      const setBtn = (btn, active) => {
+        if (!btn) return;
+        btn.classList.toggle("on", !!active);
+        btn.setAttribute("aria-pressed", String(!!active));
+      };
+      setBtn(ccSmallBtn, captionMode === "cc");
+      setBtn(ccMedBtn,   captionMode === "CC");
+      setBtn(ccXBtn,     captionMode === "CCx");
+
+      if (captionsEl){
+        captionsEl.classList.toggle("hidden", !isCaptionsOn());
+        captionsEl.style.setProperty("--capLines", String(getCaptionMaxLines()));
+        if (!isCaptionsOn()){
+          captionsEl.innerHTML = "";
+          captionsEl.classList.add("isEmpty");
+        } else if (!captionsEl.innerHTML){
+          captionsEl.textContent = "…";
+          captionsEl.classList.add("isEmpty");
+        }
+      }
+
+      setTimeout(() => clampPlayerToViewport(), 0);
+    }
+
+    function stripSrtTags(s){
+      return (s || "").toString().replace(/<[^>]+>/g, "");
+    }
+    function srtTimeToSec(raw){
+      const s = String(raw || "").trim().replace(",", ".");
+      const m = s.match(/^(\d{1,2}):(\d{2}):(\d{2})(\.\d+)?$/);
+      if (!m) return null;
+      const hh = Number(m[1]), mm = Number(m[2]), ss = Number(m[3]);
+      const frac = Number(m[4] || "0");
+      if (![hh,mm,ss,frac].every(Number.isFinite)) return null;
+      return hh * 3600 + mm * 60 + ss + frac;
+    }
+    function parseSrtToCues(srtText){
+      let t = (srtText || "").replace(/^\uFEFF/, "");
+      t = t.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+      const blocks = t.split(/\n{2,}/g);
+
+      const cues = [];
+      for (const block of blocks){
+        const lines = block.split("\n").map(x => x.trimEnd()).filter(x => x.trim().length > 0);
+        if (!lines.length) continue;
+
+        let timeIdx = 0;
+        if (/^\d+$/.test(lines[0].trim()) && lines.length >= 2) timeIdx = 1;
+
+        const timeLine = lines[timeIdx] || "";
+        const tm = timeLine.match(/(.+?)\s*-->\s*(.+)/);
+        if (!tm) continue;
+
+        const start = srtTimeToSec(tm[1]);
+        const end = srtTimeToSec((tm[2].split(/\s+/)[0]) || "");
+        if (start == null || end == null || !(end > start)) continue;
+
+        const text = stripSrtTags(lines.slice(timeIdx + 1).join("\n")).trim();
+        if (!text) continue;
+
+        cues.push({ start, end, text });
+      }
+
+      cues.sort((a,b) => a.start - b.start);
+      return cues;
+    }
+    function findCueIdx(cues, t){
+      if (!cues.length) return -1;
+      let lo = 0, hi = cues.length - 1;
+      while (lo <= hi){
+        const mid = (lo + hi) >> 1;
+        const c = cues[mid];
+        if (t < c.start) hi = mid - 1;
+        else if (t >= c.end) lo = mid + 1;
+        else return mid;
+      }
+      return -1;
+    }
+    function escapeHtml(s){
+      return (s ?? "").toString()
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#39;");
+    }
+    function splitCaptionLines(text){
+      const t = (text || "").toString().replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+      return t.split("\n").map(l => l.trimEnd()).filter(l => l.trim().length > 0);
+    }
+    function countLinesText(text){
+      return splitCaptionLines(text).length;
+    }
+    function composeCaptionParts(cues, idx){
+      if (!cues || idx < 0 || idx >= cues.length) return [];
+      const parts = [];
+      const target = getCaptionTargetLines();
+      const wide = getCaptionMaxLines() > CAPTION_MAX_LINES;
+
+      if (wide){
+        const preTarget = Math.max(2, Math.floor(target / 3));
+        let preLines = 0;
+        let p = idx - 1;
+        const stack = [];
+        while (p >= 0 && preLines < preTarget){
+          const c = cues[p];
+          const t = c?.text || "";
+          const n = countLinesText(t);
+          if (n > 0){
+            stack.push({ role: "context", isActive: false, text: t, start: c.start, end: c.end });
+            preLines += n;
+          }
+          p--;
+        }
+        stack.reverse().forEach(x => parts.push(x));
+      } else if (idx > 0){
+        const c = cues[idx - 1];
+        parts.push({ role: "context", isActive: false, text: c?.text || "", start: c.start, end: c.end });
+      }
+
+      {
+        const c = cues[idx];
+        parts.push({ role: "active", isActive: true, text: c?.text || "", start: c.start, end: c.end });
+      }
+
+      let total = parts.reduce((a,p) => a + countLinesText(p.text), 0);
+      let nidx = idx + 1;
+
+      while (total < target && nidx < cues.length){
+        const c = cues[nidx];
+        const t = c?.text || "";
+        const n = countLinesText(t);
+        if (n > 0){
+          parts.push({ role: "context", isActive: false, text: t, start: c.start, end: c.end });
+          total += n;
+        }
+        nidx++;
+      }
+
+      return parts;
+    }
+    function trimLinesAroundActive(lines, maxLines){
+      if (lines.length <= maxLines) return { lines, activeStart: -1, activeEnd: -1 };
+
+      let activeStart = lines.findIndex(l => l.isActive);
+      let activeEnd = lines.length - 1 - [...lines].reverse().findIndex(l => l.isActive);
+      if (activeStart < 0) activeStart = activeEnd = Math.floor(lines.length / 2);
+
+      let start = 0;
+      let end = lines.length - 1;
+
+      while ((end - start + 1) > maxLines){
+        const distTop = activeStart - start;
+        const distBot = end - activeEnd;
+        if (distTop > distBot) start += 1;
+        else end -= 1;
+      }
+
+      const sliced = lines.slice(start, end + 1);
+      const newActiveStart = Math.max(0, activeStart - start);
+      const newActiveEnd = Math.max(newActiveStart, activeEnd - start);
+
+      return { lines: sliced, activeStart: newActiveStart, activeEnd: newActiveEnd };
+    }
+
+    // segment replay (caption satır tıkla -> start..end)
+    let segEndTime = null;
+    let segResumeAfter = false;
+    let segResumeTime = null;
+
+    function armSegmentEnd(end, resumeAfter, resumeTime){
+      segEndTime = (Number.isFinite(end) ? end : null);
+      segResumeAfter = !!resumeAfter;
+      segResumeTime = (Number.isFinite(resumeTime) ? resumeTime : null);
+    }
+    function maybeStopAtSegmentEnd(){
+      if (segEndTime == null) return;
+
+      const t = Number(playerEl.currentTime) || 0;
+      if (t < (segEndTime - 0.03)) return;
+
+      const resumeAfter = segResumeAfter;
+      const resumeTime = segResumeTime;
+
+      segEndTime = null;
+      segResumeAfter = false;
+      segResumeTime = null;
+
+      if (resumeAfter){
+        try{
+          const dur = Number(playerEl.duration);
+          const target = Number.isFinite(resumeTime) ? resumeTime : (t + 0.01);
+          const safeTarget = Number.isFinite(dur) && dur > 0
+            ? Math.min(Math.max(0, target), Math.max(0, dur - 0.05))
+            : Math.max(0, target);
+
+          playerEl.currentTime = safeTarget;
+          const p = plyr.play();
+          if (p && typeof p.catch === "function") p.catch(()=>{});
+          return;
+        }catch{}
+      }
+
+      try{ plyr.pause(); }catch{}
+    }
+    playerEl.addEventListener("timeupdate", maybeStopAtSegmentEnd);
+
+    function playSegment(start, end){
+      if (!Number.isFinite(start) || !Number.isFinite(end) || !(end > start)) return;
+      const resumeAfter = !playerEl.paused;
+      const resumeTime = end + 0.01;
+
+      try{
+        armSegmentEnd(end, resumeAfter, resumeTime);
+        playerEl.currentTime = Math.max(0, start + 0.01);
+        const p = plyr.play();
+        if (p && typeof p.catch === "function") p.catch(()=>{});
+      }catch{}
+    }
+
+    function renderCaptionLines(lines){
+      if (!captionsEl) return;
+      if (!isCaptionsOn()) { captionsEl.innerHTML = ""; return; }
+
+      const maxLines = getCaptionMaxLines();
+      captionsEl.style.setProperty("--capLines", String(maxLines));
+
+      const { lines: trimmed, activeStart, activeEnd } = trimLinesAroundActive(lines, maxLines);
+
+      const out = [];
+      for (let i = 0; i < trimmed.length; i++){
+        const ln = trimmed[i];
+        const isActive = !!ln.isActive;
+
+        let dist = 0;
+        if (!isActive){
+          if (i < activeStart) dist = activeStart - i;
+          else if (i > activeEnd) dist = i - activeEnd;
+          else dist = 1;
+        }
+
+        const opacity = isActive ? 1 : Math.max(0.20, 0.92 - (dist * 0.12));
+        const weight = isActive ? 750 : 500;
+
+        const ds = Number.isFinite(ln.start) ? ` data-start="${ln.start}"` : "";
+        const de = Number.isFinite(ln.end) ? ` data-end="${ln.end}"` : "";
+
+        out.push(`<span class="capLine" style="opacity:${opacity.toFixed(2)};font-weight:${weight}"${ds}${de}>${escapeHtml(ln.text)}</span>`);
+      }
+
+      const html = out.join("<br>");
+      captionsEl.innerHTML = html || "…";
+      captionsEl.classList.toggle("isEmpty", !html);
+      setTimeout(() => clampPlayerToViewport(), 0);
+    }
+
+    function renderCaptionInfo(text){
+      if (!captionsEl) return;
+      if (!isCaptionsOn()) { captionsEl.innerHTML = ""; return; }
+      captionsEl.textContent = text || "…";
+      captionsEl.classList.add("isEmpty");
+      setTimeout(() => clampPlayerToViewport(), 0);
+    }
+
+    function onCaptionsTimeupdate(){
+      if (!isCaptionsOn()) return;
+      if (!activeCues.length) return;
+
+      const t = Number(playerEl?.currentTime) || 0;
+      const idx = findCueIdx(activeCues, t);
+
+      if (idx === -1){
+        if (lastCueIdx === -1) renderCaptionInfo("…");
+        return;
+      }
+
+      if (idx === lastCueIdx) return;
+      lastCueIdx = idx;
+
+      const parts = composeCaptionParts(activeCues, idx);
+      const flat = [];
+      for (const p of parts){
+        for (const line of splitCaptionLines(p.text)){
+          flat.push({ text: line, isActive: !!p.isActive, start: p.start, end: p.end });
+        }
+      }
+
+      renderCaptionLines(flat);
+    }
+    playerEl.addEventListener("timeupdate", onCaptionsTimeupdate);
+
+    captionsEl.addEventListener("click", (e) => {
+      if (!isCaptionsOn()) return;
+      if (!activeCues.length) return;
+      const span = e.target && e.target.closest ? e.target.closest(".capLine") : null;
+      if (!span) return;
+      const s = Number(span.getAttribute("data-start"));
+      const en = Number(span.getAttribute("data-end"));
+      if (Number.isFinite(s) && Number.isFinite(en) && en > s){
+        playSegment(s, en);
+      }
+    });
+
+    function fileBaseNameFromItem(it){
+      const rawName = (it?.name || "").split("/").pop() || "";
+      const decoded = decodeURIComponentSafe(rawName);
+      return { rawName, decoded };
+    }
+
+    function replaceExt(name, ext){
+      const s = String(name || "");
+      if (!s) return "";
+      if (/\.(m4a|mp3)$/i.test(s)) return s.replace(/\.(m4a|mp3)$/i, ext);
+      return s + ext;
+    }
+
+    function buildTranscriptCandidates(it, ext){
+      const { rawName, decoded } = fileBaseNameFromItem(it);
+
+      const a = replaceExt(decoded, ext);
+      const b = replaceExt(rawName, ext);
+
+      const out = [];
+      const seen = new Set();
+      for (const n of [a, b]){
+        const nn = String(n || "").trim();
+        if (!nn) continue;
+        if (seen.has(nn)) continue;
+        seen.add(nn);
+        out.push(nn);
+      }
+      return out;
+    }
+
+    function joinUrl(base, folder, file){
+      const b = String(base || "").replace(/\/+$/,"") + "/";
+      const f = String(folder || "").replace(/^\/+/,"").replace(/\/+$/,"");
+      const p = f ? (f + "/") : "";
+      return b + p + encodeURIComponent(file);
+    }
+
+    async function loadSrtForItem(it){
+      activeCues = [];
+      lastCueIdx = -1;
+
+      if (!isCaptionsOn()) return renderCaptionInfo("");
+      if (!it) return renderCaptionInfo("Bir kayıt seç...");
+
+      const cached = srtCache.get(it.id);
+      if (cached){
+        activeCues = cached;
+        renderCaptionInfo("…");
+        return onCaptionsTimeupdate();
+      }
+
+      renderCaptionInfo("Altyazı yükleniyor…");
+
+      try { if (srtCtrl) srtCtrl.abort(); } catch {}
+      srtCtrl = new AbortController();
+
+      const candidates = buildTranscriptCandidates(it, ".srt");
+      const urls = [];
+      for (const name of candidates){
+        for (const base of TRANSCRIPT_BASES){
+          urls.push(joinUrl(base, TX_FOLDER, name));
+        }
+      }
+
+      try{
+        let cues = null;
+        for (const u of urls){
+          const res = await fetch(u, { cache: "no-store", signal: srtCtrl.signal });
+          if (!res.ok) continue;
+          const body = await res.text();
+          const parsed = parseSrtToCues(body);
+          if (parsed && parsed.length){ cues = parsed; break; }
+        }
+        if (!cues) throw new Error("srt not found");
+
+        srtCache.set(it.id, cues);
+        activeCues = cues;
+        renderCaptionInfo("…");
+        onCaptionsTimeupdate();
+      }catch(err){
+        if (err && err.name === "AbortError") return;
+        renderCaptionInfo("Bu kayıtta altyazı yok.");
+      }
+    }
+
+    function setModeOrToggle(nextMode){
+      if (captionMode === nextMode){
+        captionMode = "";
+        localStorage.setItem(LS.captionsMode, "");
+      } else {
+        captionMode = nextMode;
+        localStorage.setItem(LS.captionsMode, nextMode);
+      }
+      setCaptionUi();
+
+      const it = items.find(x => x.id === activeId);
+      if (isCaptionsOn() && it) loadSrtForItem(it).catch(()=>{});
+      if (!isCaptionsOn()) {
+        activeCues = [];
+        lastCueIdx = -1;
+        renderCaptionInfo("");
+      }
+    }
+
+    ccSmallBtn.addEventListener("click", (e) => { e.stopPropagation(); setModeOrToggle("cc"); });
+    ccMedBtn.addEventListener("click",   (e) => { e.stopPropagation(); setModeOrToggle("CC"); });
+    ccXBtn.addEventListener("click",     (e) => { e.stopPropagation(); setModeOrToggle("CCx"); });
+
+    // =========================
+    // TXT TRANSCRIPT — taşınan modül
+    // =========================
+    const TX_DEFAULT_SIZE = { w: 720, h: 600 };
+    const TX_MIN_SIZE = { w: 280, h: 220 };
+
+    let txOpen = false;
+    let txCurrent = null;
+    let txPlainText = "";
+    let txMatches = [];
+    let txActiveMatch = -1;
+    let txSearchTimer = null;
+
+    // in-memory cache (isteğe bağlı TTL)
+    const txCache = new Map(); // id -> { text, at, url, filename }
+    const TX_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+
+    function setTxtBtnUi(){
+      fpTxtBtn.classList.toggle("on", !!txOpen);
+      fpTxtBtn.setAttribute("aria-pressed", String(!!txOpen));
+    }
+
+    function openTranscript(){
+      txOpen = true;
+      txPanel.classList.add("open");
+      txPanel.setAttribute("aria-hidden", "false");
+      updateTxOverlayScale();
+      restoreTxPos();
+      clampTxSizeToViewport();
+      clampTxPosToViewport();
+      setTxtBtnUi();
+    }
+
+    function closeTranscript(){
+      txOpen = false;
+      txPanel.classList.remove("open");
+      txPanel.setAttribute("aria-hidden", "true");
+      txSearchRow.classList.remove("on");
+      setTxtBtnUi();
+    }
+
+    txCloseBtn.addEventListener("click", () => closeTranscript());
+
+    function clearTxSearchUI(){
+      txMatches = [];
+      txActiveMatch = -1;
+      txMatchCountEl.textContent = "0/0";
+      txPrevMatchBtn.disabled = true;
+      txNextMatchBtn.disabled = true;
+      txContentEl.textContent = txPlainText || "";
+    }
+
+    function escapeForRegex(s){
+      return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    }
+
+    function buildHighlightedHtml(text, ranges, activeIdx){
+      if (!ranges.length) return escHtml(text);
+      const parts = [];
+      let last = 0;
+      for (let i=0; i<ranges.length; i++){
+        const r = ranges[i];
+        const a = Math.max(0, r[0]);
+        const b = Math.max(a, r[1]);
+        if (a > last) parts.push(escHtml(text.slice(last, a)));
+        const cls = (i === activeIdx) ? "txMark active" : "txMark";
+        parts.push(`<span class="${cls}" data-mi="${i}">${escHtml(text.slice(a, b))}</span>`);
+        last = b;
+      }
+      if (last < text.length) parts.push(escHtml(text.slice(last)));
+      return parts.join("");
+    }
+
+    function computeMatches(text, q){
+      const out = [];
+      if (!q) return out;
+      const re = new RegExp(escapeForRegex(q), "gi");
+      let m;
+      while ((m = re.exec(text))){
+        const a = m.index;
+        const b = a + (m[0] || "").length;
+        if (b > a) out.push([a, b]);
+        if (out.length >= 2000) break;
+        if (m[0].length === 0) re.lastIndex++;
+      }
+      return out;
+    }
+
+    function applyTxSearch(){
+      const q = (txSearchInput.value || "").trim();
+      if (!q){
+        clearTxSearchUI();
+        return;
+      }
+      txMatches = computeMatches(txPlainText, q);
+      txActiveMatch = txMatches.length ? 0 : -1;
+
+      txPrevMatchBtn.disabled = txMatches.length < 2;
+      txNextMatchBtn.disabled = txMatches.length < 2;
+
+      txMatchCountEl.textContent = txMatches.length ? `1/${txMatches.length}` : `0/0`;
+      txContentEl.innerHTML = buildHighlightedHtml(txPlainText, txMatches, txActiveMatch);
+
+      if (txMatches.length){
+        setTimeout(() => scrollToActiveMatch(), 0);
+      }
+    }
+
+    function scrollToActiveMatch(){
+      const el = txContentEl.querySelector(".txMark.active");
+      if (!el) return;
+      try{
+        el.scrollIntoView({ block: "center", inline: "nearest", behavior: "smooth" });
+      }catch{
+        el.scrollIntoView();
+      }
+    }
+
+    function setActiveMatch(idx){
+      if (!txMatches.length) return;
+      txActiveMatch = ((idx % txMatches.length) + txMatches.length) % txMatches.length;
+      txMatchCountEl.textContent = `${txActiveMatch + 1}/${txMatches.length}`;
+
+      const old = txContentEl.querySelector(".txMark.active");
+      if (old) old.classList.remove("active");
+      const next = txContentEl.querySelector(`.txMark[data-mi="${txActiveMatch}"]`);
+      if (next){
+        next.classList.add("active");
+        scrollToActiveMatch();
+      }else{
+        txContentEl.innerHTML = buildHighlightedHtml(txPlainText, txMatches, txActiveMatch);
+        setTimeout(() => scrollToActiveMatch(), 0);
+      }
+    }
+
+    txSearchBtn.addEventListener("click", () => {
+      const on = txSearchRow.classList.toggle("on");
+      if (on){
+        txSearchInput.focus();
+        txSearchInput.select();
+      }
+    });
+
+    txSearchInput.addEventListener("input", () => {
+      clearTimeout(txSearchTimer);
+      txSearchTimer = setTimeout(applyTxSearch, 180);
+    });
+
+    txSearchInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter"){
+        e.preventDefault();
+        if (!txMatches.length){
+          applyTxSearch();
+          return;
+        }
+        if (e.shiftKey) setActiveMatch(txActiveMatch - 1);
+        else setActiveMatch(txActiveMatch + 1);
+      } else if (e.key === "Escape"){
+        e.preventDefault();
+        txSearchRow.classList.remove("on");
+      }
+    });
+
+    txPrevMatchBtn.addEventListener("click", () => setActiveMatch(txActiveMatch - 1));
+    txNextMatchBtn.addEventListener("click", () => setActiveMatch(txActiveMatch + 1));
+
+    async function copyToClipboard(text){
+      if (!text) return false;
+      try{
+        await navigator.clipboard.writeText(text);
+        return true;
+      }catch{}
+      try{
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.position = "fixed";
+        ta.style.left = "-9999px";
+        ta.style.top = "-9999px";
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        const ok = document.execCommand("copy");
+        ta.remove();
+        return !!ok;
+      }catch{
+        return false;
+      }
+    }
+
+    txCopyBtn.addEventListener("click", async () => {
+      const ok = await copyToClipboard(txPlainText);
+      txInfoEl.textContent = ok ? "Kopiert." : "Kopieren fehlgeschlagen.";
+      setTimeout(() => {
+        if (txCurrent) updateTxInfo(txCurrent);
+      }, 1200);
+    });
+
+    txDownloadBtn.addEventListener("click", () => {
+      if (!txCurrent) return;
+      const info = getTxtUrlForItem(txCurrent);
+      if (!info?.url) return;
+      const filename = info.filename || "transkript.txt";
+      forceDownload(info.url, filename);
+      trackTranscriptDownload(txCurrent, filename);
+    });
+
+    function updateTxInfo(it){
+      const info = getTxtUrlForItem(it);
+      const file = (info?.filename || "—");
+      txInfoEl.textContent = file ? `TXT: ${file}` : "—";
+    }
+
+    function getTxtUrlForItem(it){
+      const candidates = buildTranscriptCandidates(it, ".txt");
+      const filename = candidates[0] || "";
+      const url = filename ? joinUrl(TRANSCRIPT_BASES[0], TX_FOLDER, filename) : "";
+      return { filename, url };
+    }
+
+    async function fetchTranscriptText(it){
+      const cached = txCache.get(it.id);
+      if (cached && (Date.now() - cached.at) < TX_CACHE_TTL_MS) return cached;
+
+      const candidates = buildTranscriptCandidates(it, ".txt");
+      const urls = [];
+      for (const name of candidates){
+        for (const base of TRANSCRIPT_BASES){
+          urls.push({ url: joinUrl(base, TX_FOLDER, name), filename: name });
+        }
+      }
+
+      let lastErr = null;
+      for (const u of urls){
+        try{
+          const res = await fetch(u.url, { cache: "no-cache" });
+          if (!res.ok) throw new Error("txt fetch failed: " + res.status);
+          const text = await res.text();
+
+          const packed = { text: text || "", at: Date.now(), url: u.url, filename: u.filename };
+          txCache.set(it.id, packed);
+          return packed;
+        }catch(err){
+          lastErr = err;
+        }
+      }
+      throw (lastErr || new Error("txt fetch failed"));
+    }
+
+    async function openTranscriptFor(it){
+      if (!it) return;
+      txCurrent = it;
+      openTranscript();
+      trackTranscriptOpen(it);
+
+      txTitleEl.textContent = it.title || "Transkript";
+      updateTxInfo(it);
+
+      txCopyBtn.disabled = true;
+      txDownloadBtn.disabled = true;
+      txContentEl.textContent = "Yükleniyor…";
+      txPlainText = "";
+      clearTxSearchUI();
+
+      try{
+        const packed = await fetchTranscriptText(it);
+        txPlainText = packed.text || "";
+        txCopyBtn.disabled = !txPlainText;
+        txDownloadBtn.disabled = !packed.url;
+        updateTxInfo(it);
+        clearTxSearchUI();
+      }catch{
+        txContentEl.textContent = "TXT yüklenemedi.";
+        txCopyBtn.disabled = true;
+        txDownloadBtn.disabled = true;
+      }
+    }
+
+    function toggleTranscriptFromPlayer(){
+      if (txOpen){
+        closeTranscript();
+        return;
+      }
+      const it = items.find(x => x.id === activeId) || null;
+      if (!it){
+        openTranscript();
+        txTitleEl.textContent = "Transkript";
+        txInfoEl.textContent = "—";
+        txPlainText = "";
+        txContentEl.textContent = "Bir kayıt seç...";
+        txCopyBtn.disabled = true;
+        txDownloadBtn.disabled = true;
+        return;
+      }
+      openTranscriptFor(it).catch(()=>{});
+    }
+
+    fpTxtBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      toggleTranscriptFromPlayer();
+    });
+
+    // cache clear button (optional)
+    txCacheClearBtn.addEventListener("click", () => {
+      txCache.clear();
+      txCacheMsg.textContent = "TXT cache temizlendi.";
+      setTimeout(() => { txCacheMsg.textContent = ""; }, 1600);
+    });
+
+    // =========================
+    // Transcript panel: position/size + drag + resize
+    // =========================
+    function getTxPosPx(){
+      const cs = getComputedStyle(txPanel);
+      const top = parseFloat(txPanel.style.top || cs.top || "0");
+      const right = parseFloat(txPanel.style.right || cs.right || "0");
+      return { top: Number.isFinite(top) ? top : 0, right: Number.isFinite(right) ? right : 0 };
+    }
+    function setTxPosPx(top, right){
+      txPanel.style.top = top + "px";
+      txPanel.style.right = right + "px";
+      txPanel.style.left = "auto";
+      txPanel.style.bottom = "auto";
+    }
+    function saveTxPos(top, right){
+      saveAny(LS.txPos, { top, right });
+    }
+    function restoreTxPos(){
+      const saved = loadAny(LS.txPos);
+      if (!saved) return;
+      if (typeof saved.top === "number" && typeof saved.right === "number"){
+        setTxPosPx(saved.top, saved.right);
+      }
+    }
+
+    function clampTxPosCandidate(top, right){
+      const { vw, vh } = getViewportWH();
+      const rect = txPanel.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+
+      const margin = 14;
+      const minTop = margin;
+      const maxTop = Math.max(minTop, vh - h - margin);
+
+      const minRight = margin;
+      const maxRight = Math.max(minRight, vw - w - margin);
+
+      return {
+        top: Math.min(maxTop, Math.max(minTop, top)),
+        right: Math.min(maxRight, Math.max(minRight, right)),
+      };
+    }
+
+    function clampTxPosToViewport(){
+      if (!txOpen) return;
+      const cur = getTxPosPx();
+      const cl = clampTxPosCandidate(cur.top, cur.right);
+      setTxPosPx(cl.top, cl.right);
+      saveTxPos(cl.top, cl.right);
+    }
+
+    function clampTxSizeToViewport(){
+      if (!txOpen) return;
+
+      const saved = loadAny(LS.txSize);
+      if (saved && typeof saved.w === "number" && typeof saved.h === "number"){
+        txPanel.style.width = saved.w + "px";
+        txPanel.style.height = saved.h + "px";
+      } else {
+        txPanel.style.width = TX_DEFAULT_SIZE.w + "px";
+        txPanel.style.height = TX_DEFAULT_SIZE.h + "px";
+      }
+
+      const { vw, vh } = getViewportWH();
+      const vwL = toLayoutPx(vw);
+      const vhL = toLayoutPx(vh);
+
+      const margin = 28;
+      const maxW = Math.max(TX_MIN_SIZE.w, vwL - margin);
+      const maxH = Math.max(TX_MIN_SIZE.h, vhL - margin);
+
+      const curW = txPanel.offsetWidth || TX_DEFAULT_SIZE.w;
+      const curH = txPanel.offsetHeight || TX_DEFAULT_SIZE.h;
+
+      const minW = Math.min(maxW, TX_MIN_SIZE.w);
+      const minH = Math.min(maxH, TX_MIN_SIZE.h);
+
+      const w = Math.min(maxW, Math.max(minW, curW));
+      const h = Math.min(maxH, Math.max(minH, curH));
+
+      txPanel.style.width = w + "px";
+      txPanel.style.height = h + "px";
+
+      saveAny(LS.txSize, { w, h });
+    }
+
+    // Drag transcript panel
+    const TX_DRAG_IGNORE_SELECTOR = "button, a, input, textarea, select, option";
+    function shouldStartTxDrag(target){
+      return !(target && target.closest && target.closest(TX_DRAG_IGNORE_SELECTOR));
+    }
+
+    let txDragging = false;
+    let txDragStartX = 0, txDragStartY = 0;
+    let txDragStartTop = 0, txDragStartRight = 0;
+
+    txHeader.addEventListener("pointerdown", (e) => {
+      if (!txOpen) return;
+      if (!shouldStartTxDrag(e.target)) return;
+
+      txDragging = true;
+      txHeader.setPointerCapture(e.pointerId);
+      txHeader.style.cursor = "grabbing";
+
+      txDragStartX = e.clientX;
+      txDragStartY = e.clientY;
+
+      const cur = getTxPosPx();
+      txDragStartTop = cur.top;
+      txDragStartRight = cur.right;
+
+      e.preventDefault();
+      e.stopPropagation();
+    });
+
+    txHeader.addEventListener("pointermove", (e) => {
+      if (!txDragging) return;
+
+      const dx = e.clientX - txDragStartX;
+      const dy = e.clientY - txDragStartY;
+
+      const cl = clampTxPosCandidate(txDragStartTop + dy, txDragStartRight - dx);
+      setTxPosPx(cl.top, cl.right);
+
+      e.preventDefault();
+    });
+
+    function endTxDrag(pointerId){
+      if (!txDragging) return;
+      txDragging = false;
+      txHeader.style.cursor = "grab";
+      try{ txHeader.releasePointerCapture(pointerId); }catch{}
+      clampTxPosToViewport();
+    }
+
+    txHeader.addEventListener("pointerup", (e) => endTxDrag(e.pointerId));
+    txHeader.addEventListener("pointercancel", (e) => endTxDrag(e.pointerId));
+
+    // Resize transcript panel
+    let txResizing = false;
+    let txResizeStartX = 0, txResizeStartY = 0;
+    let txResizeStartW = 0, txResizeStartH = 0;
+
+    function saveTxSize(w, h){
+      saveAny(LS.txSize, { w, h });
+    }
+
+    function clampTxSize(w, h){
+      const { vw, vh } = getViewportWH();
+      const vwL = toLayoutPx(vw);
+      const vhL = toLayoutPx(vh);
+
+      const margin = 28;
+      const maxW = Math.max(TX_MIN_SIZE.w, vwL - margin);
+      const maxH = Math.max(TX_MIN_SIZE.h, vhL - margin);
+
+      const minW = Math.min(maxW, TX_MIN_SIZE.w);
+      const minH = Math.min(maxH, TX_MIN_SIZE.h);
+
+      const cw = Math.min(maxW, Math.max(minW, w));
+      const ch = Math.min(maxH, Math.max(minH, h));
+      return { w: cw, h: ch };
+    }
+
+    txResizeHandle.addEventListener("pointerdown", (e) => {
+      if (!txOpen) return;
+      txResizing = true;
+      txResizeStartX = e.clientX;
+      txResizeStartY = e.clientY;
+      txResizeStartW = txPanel.offsetWidth;
+      txResizeStartH = txPanel.offsetHeight;
+      txResizeHandle.setPointerCapture(e.pointerId);
+      e.preventDefault();
+      e.stopPropagation();
+    });
+
+    txResizeHandle.addEventListener("pointermove", (e) => {
+      if (!txResizing) return;
+
+      const dxClient = e.clientX - txResizeStartX;
+      const dyClient = e.clientY - txResizeStartY;
+
+      const dx = useTransformScale ? (dxClient / uiScale) : dxClient;
+      const dy = useTransformScale ? (dyClient / uiScale) : dyClient;
+
+      const w = txResizeStartW - dx;
+      const h = txResizeStartH + dy;
+
+      const cl = clampTxSize(w, h);
+      txPanel.style.width = cl.w + "px";
+      txPanel.style.height = cl.h + "px";
+      saveTxSize(cl.w, cl.h);
+    });
+
+    function endTxResize(pointerId){
+      if (!txResizing) return;
+      txResizing = false;
+      try{ txResizeHandle.releasePointerCapture(pointerId); }catch{}
+      clampTxSizeToViewport();
+      clampTxPosToViewport();
+    }
+
+    txResizeHandle.addEventListener("pointerup", (e) => endTxResize(e.pointerId));
+    txResizeHandle.addEventListener("pointercancel", (e) => endTxResize(e.pointerId));
+
+    // =========================
+    // Misc (korunur)
+    // =========================
+    function setMediaOnOffButtons(){ /* placeholder yok — çakışma yok */ }
+
+    // =========================
+    // Init (korunur + yeni modüller)
+    // =========================
     setSortIcons();
     restorePlayerPos();
     restoreSpeed();
     restoreZoom();
+    setCaptionUi();
+    updateTxOverlayScale();
+    setTxtBtnUi();
     setTimeout(clampPlayerToViewport, 0);
+
+    // filtre reset state (korunur davranış)
+    filterFavBtn.addEventListener("click", () => { filterFav = !filterFav; render(); });
+
+    // keep: list load
     loadItems();
+
+    // =========================
+    // DL + NAV + Key handlers (korunur)
+    // =========================
+    function makeSafeFilenameFromItem(it){
+      return (it.name || it.file || "").split("/").pop() ||
+        (it.title || "audio").replace(/[\\/:*?"<>|]+/g, "_") + ".m4a";
+    }
+
+    // icon buttons already wired in render()
+
+    // =========================
+    // Existing "check" filterSel placeholder unchanged
+    // =========================
+
+    // =========================
+    // Utility: when captions mode toggles, try load on active
+    // =========================
+    function refreshCaptionsForActive(){
+      const it = items.find(x => x.id === activeId) || null;
+      if (!it) {
+        renderCaptionInfo("Bir kayıt seç...");
+        return;
+      }
+      loadSrtForItem(it).catch(()=>{});
+    }
+
+    // When toggling CC buttons, setModeOrToggle handles; also ensure caption text when turning on without active cues
+    if (captionsEl){
+      if (!isCaptionsOn()){
+        captionsEl.classList.add("hidden");
+      } else {
+        captionsEl.classList.remove("hidden");
+      }
+    }
+
+    // =========================
+    // Non-intrusive: prevent txPanel click from bubbling to drag or other
+    // =========================
+    txPanel.addEventListener("click", (e) => e.stopPropagation());
+
+    // =========================
+    // Patch: if captions turned on with no active item, show hint
+    // =========================
+    if (isCaptionsOn() && !activeId){
+      renderCaptionInfo("Bir kayıt seç...");
+    }
   </script>
 </body>
 </html>
